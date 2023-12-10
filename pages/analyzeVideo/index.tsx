@@ -2,17 +2,26 @@ import Form from "../components/Form"
 import { mobileNetModelLoad } from "@/utils/mobileNetModelLoad";
 import { moveNetModelLoad } from "@/utils/moveNetModelLoad";
 import { blazePoseModelLoad } from "@/utils/blazePoseModelLoad";
+import { useState } from "react";
+import * as poseDetection from '@tensorflow-models/pose-detection';
+import * as mobilenet from '@tensorflow-models/mobilenet';
+
+
 
 export default function analyzeVideo() {
-    let mobileNetModel
-    let moveNetModel
-    let blazePoseModel
+
+    const [mobileNetModel, setMobileNetModel] = useState<mobilenet.MobileNet | null>(null)
+    const [moveNetModel, setMoveNetModel] = useState<poseDetection.PoseDetector | null>(null)
+    const [blazePoseModel, setBlazePoseModel] = useState<poseDetection.PoseDetector | null>(null)
 
     const handleModelLoad = async () => {
         console.log("モデルロード開始")
-        mobileNetModel = await mobileNetModelLoad()
-        moveNetModel = await moveNetModelLoad()
-        // blazePoseModel = await blazePoseModelLoad()
+        const mobileNetModel = await mobileNetModelLoad()
+        const moveNetModel = await moveNetModelLoad()
+        // const blazePoseModel = await blazePoseModelLoad()
+        setMobileNetModel(mobileNetModel)
+        setMoveNetModel(moveNetModel)
+        // setBlazePoseModel(blazePoseModel)
         console.log("モデルロード終了")
     }
 
