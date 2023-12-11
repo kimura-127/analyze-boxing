@@ -5,6 +5,8 @@ import { blazePoseModelLoad } from "@/utils/blazePoseModelLoad";
 import { useState } from "react";
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import * as mobilenet from '@tensorflow-models/mobilenet';
+import * as tf from '@tensorflow/tfjs-core';
+import AnalyzeVideo from "../components/AnalyzeVideo";
 
 
 
@@ -16,6 +18,7 @@ export default function analyzeVideo() {
 
     const handleModelLoad = async () => {
         console.log("モデルロード開始")
+        await tf.ready()
         const mobileNetModel = await mobileNetModelLoad()
         const moveNetModel = await moveNetModelLoad()
         // const blazePoseModel = await blazePoseModelLoad()
@@ -27,6 +30,7 @@ export default function analyzeVideo() {
 
     return (
         <>
+            <AnalyzeVideo />
             <Form />
             <button onClick={handleModelLoad}>分析モデルをロードする</button>
         </>
