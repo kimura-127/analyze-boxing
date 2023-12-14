@@ -14,6 +14,7 @@ import { drawSkeleton } from "@/utils/drawSkeleton";
 import { myselfState } from "@/atoms/myselfState";
 import { opponentState } from "@/atoms/opponentState";
 import ExampleForm from "../components/ExampleForm";
+import { Tensor3D } from '@tensorflow/tfjs-core';
 
 
 
@@ -56,17 +57,19 @@ export default function analyzeVideo() {
 
         if (!handlePlayBoolean && moveNetModel && videoElement) {
             const showExample = async () => {
-                const result = await moveNetModel.estimatePoses(videoElement);
-                const croppedImageData = await croppedImage(videoElement, result)
-                const normalizedImages = drawCanvas(croppedImageData)
-                // console.log(normalizedImages)
-                // tf.browser.toPixels(normalizedImages[0], canvasElement as HTMLCanvasElement);
-                // tf.browser.toPixels(normalizedImages[1], canvasRef2.current as HTMLCanvasElement);
-                // tf.browser.toPixels(normalizedImages[2], canvasRef3.current as HTMLCanvasElement);
-                // tf.browser.toPixels(normalizedImages[3], canvasRef4.current as HTMLCanvasElement);
+                const poses = await moveNetModel.estimatePoses(videoElement);
+                console.log(poses)
             }
-
             showExample()
+            videoElement?.pause()
+            handlePlayBoolean = true
+        } else if (moveNetModel && videoElement) {
+            const animate = async () => {
+                const poses = await moveNetModel.estimatePoses(videoElement);
+                console.log(poses)
+                videoElement?.paused || requestAnimationFrame(animate);
+            }
+            requestAnimationFrame(animate)
         }
 
     };
