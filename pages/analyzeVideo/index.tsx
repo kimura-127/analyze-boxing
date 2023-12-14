@@ -66,7 +66,14 @@ export default function analyzeVideo() {
         } else if (moveNetModel && videoElement) {
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
+                const person_1 = await poses[0]
+                const person_2 = await poses[1]
+                const person_3 = await poses[2]
                 console.log(poses)
+                canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                drawSkeleton(ctx, videoElement, person_1)
+                drawSkeleton(ctx, videoElement, person_2)
+                drawSkeleton(ctx, videoElement, person_3)
                 videoElement?.paused || requestAnimationFrame(animate);
             }
             requestAnimationFrame(animate)
