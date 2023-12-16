@@ -15,6 +15,7 @@ import { myselfState } from "@/atoms/myselfState";
 import { opponentState } from "@/atoms/opponentState";
 import ExampleForm from "../components/ExampleForm";
 import { Tensor3D } from '@tensorflow/tfjs-core';
+import { drawExample } from "@/utils/drawExample";
 
 
 
@@ -66,12 +67,8 @@ export default function analyzeVideo() {
             const showExample = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
                 console.log(poses)
-                const croppXMin = videoElement.videoWidth * poses[0].box.xMin
-                const croppYMin = videoElement.videoHeight * poses[0].box.yMin
-                const croppWidth = videoElement.videoWidth * poses[0].box.width
-                const croppHeight = videoElement.videoHeight * poses[0].box.height
-                console.log(croppWidth, croppHeight)
-                example1Ctx.drawImage(videoElement, croppXMin, croppYMin, croppWidth, croppHeight, 0, 0, 300, 150)
+                drawExample(videoElement, poses[0], example1Ctx)
+                drawExample(videoElement, poses[1], example2Ctx)
             }
             showExample()
             videoElement?.pause()
@@ -129,8 +126,8 @@ export default function analyzeVideo() {
                 height="400px"
                 style={{ position: 'fixed', top: '0', left: '0', height: '400px', width: '700px', pointerEvents: 'none' }}
             />
-            <canvas ref={canvasRef1} style={{ width: "80px", height: "200px" }} />
-            <canvas ref={canvasRef2} style={{ width: "80px", height: "200px" }} />
+            <canvas ref={canvasRef1} style={{ width: "100px", height: "240px" }} />
+            <canvas ref={canvasRef2} style={{ width: "100px", height: "240px" }} />
             {/* <canvas ref={canvasRef3} style={{ width: "100px", height: "100px" }} /> */}
             {/* <canvas ref={canvasRef4} style={{ width: "100px", height: "100px" }} /> */}
             <ExampleForm />
