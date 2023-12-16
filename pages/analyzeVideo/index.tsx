@@ -34,6 +34,8 @@ export default function analyzeVideo() {
     let moveNetModel: poseDetection.PoseDetector
     // let blazePoseModel
     let ctx: any
+    let example1Ctx: any
+    let example2Ctx: any
     let handlePlayBoolean = false
 
 
@@ -54,11 +56,22 @@ export default function analyzeVideo() {
     const handlePlay = () => {
         const videoElement = videoRef.current
         const canvasElement = canvasRef.current
+        const example1CanvasElement = canvasRef1.current
+        const example2CanvasElement = canvasRef2.current
+        example1Ctx = example1CanvasElement?.getContext('2d')
+        example2Ctx = example2CanvasElement?.getContext('2d')
+
 
         if (!handlePlayBoolean && moveNetModel && videoElement) {
             const showExample = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
                 console.log(poses)
+                const croppXMin = videoElement.videoWidth * poses[0].box.xMin
+                const croppYMin = videoElement.videoHeight * poses[0].box.yMin
+                const croppWidth = videoElement.videoWidth * poses[0].box.width
+                const croppHeight = videoElement.videoHeight * poses[0].box.height
+                console.log(croppWidth, croppHeight)
+                example1Ctx.drawImage(videoElement, croppXMin, croppYMin, croppWidth, croppHeight, 0, 0, 300, 150)
             }
             showExample()
             videoElement?.pause()
@@ -94,6 +107,10 @@ export default function analyzeVideo() {
         modelLoad()
     }
 
+    const handleBoolean = () => {
+        handlePlayBoolean = false
+    }
+
     return (
         <>
             <video
@@ -112,13 +129,14 @@ export default function analyzeVideo() {
                 height="400px"
                 style={{ position: 'fixed', top: '0', left: '0', height: '400px', width: '700px', pointerEvents: 'none' }}
             />
-            <canvas ref={canvasRef1} style={{ width: "100px", height: "100px" }} />
-            <canvas ref={canvasRef2} style={{ width: "100px", height: "100px" }} />
-            <canvas ref={canvasRef3} style={{ width: "100px", height: "100px" }} />
-            <canvas ref={canvasRef4} style={{ width: "100px", height: "100px" }} />
+            <canvas ref={canvasRef1} style={{ width: "80px", height: "200px" }} />
+            <canvas ref={canvasRef2} style={{ width: "80px", height: "200px" }} />
+            {/* <canvas ref={canvasRef3} style={{ width: "100px", height: "100px" }} /> */}
+            {/* <canvas ref={canvasRef4} style={{ width: "100px", height: "100px" }} /> */}
             <ExampleForm />
             <Form />
             <button onClick={handleModelLoad}>分析モデルをロードする</button>
+            <button onClick={handleBoolean}>真偽値をリセット</button>
         </>
     )
 }
