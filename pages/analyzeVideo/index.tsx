@@ -8,8 +8,6 @@ import * as mobilenet from '@tensorflow-models/mobilenet';
 import * as tf from '@tensorflow/tfjs-core';
 import { useRecoilState } from "recoil";
 import { videoSrcState } from "@/atoms/videoSrcState";
-import { croppedImage } from "@/utils/croppedImage";
-import { drawCanvas } from "@/utils/drawCanvas";
 import { drawSkeleton } from "@/utils/drawSkeleton";
 import { myselfState } from "@/atoms/myselfState";
 import { opponentState } from "@/atoms/opponentState";
@@ -90,6 +88,50 @@ export default function analyzeVideo() {
         }
 
     };
+
+
+    useEffect(() => {
+
+
+        switch (myself) {
+            case "select1":
+                console.log("select1")
+                break;
+            case "select2":
+                console.log("select2")
+                // if (net) {
+                //     // const activation = (net as any).infer(croppedImage[1], 'conv_preds')
+                //     // console.log(activation)
+                // } else {
+                //     console.log("できまちぇん!")
+                // }
+
+                break;
+            case "select3":
+                console.log("select3")
+                break;
+            case "select4":
+                console.log("select4")
+                break;
+        }
+        switch (opponent) {
+            case "select1":
+                console.log("select1")
+                break;
+            case "select2":
+                console.log("select2")
+                break;
+            case "select3":
+                console.log("select3")
+                break;
+            case "select4":
+                console.log("select4")
+                break;
+        }
+        // if (canvasRef.current) {
+        //     canvasRef.current.style.pointerEvents = 'auto';
+        // }
+    }, [myself, opponent])
 
 
     const handleModelLoad = () => {
