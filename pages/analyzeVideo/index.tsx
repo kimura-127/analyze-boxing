@@ -29,13 +29,14 @@ export default function analyzeVideo() {
     const canvasRef4 = useRef<HTMLCanvasElement>(null);
     const [myself, setMyself] = useRecoilState(myselfState)
     const [opponent, setOpponent] = useRecoilState(opponentState)
-    // let mobileNetModel: mobilenet.MobileNet
+    const [mobileNetModel, setMobileNetModel] = useState<mobilenet.MobileNet>()
     let moveNetModel: poseDetection.PoseDetector
     // let blazePoseModel
     let ctx: any
     let example1Ctx: any
     let example2Ctx: any
     let handlePlayBoolean = false
+
 
 
     useEffect(() => {
@@ -99,20 +100,21 @@ export default function analyzeVideo() {
                 break;
             case "select2":
                 console.log("select2")
-                // if (net) {
-                //     // const activation = (net as any).infer(croppedImage[1], 'conv_preds')
-                //     // console.log(activation)
-                // } else {
-                //     console.log("できまちぇん!")
-                // }
+                if (mobileNetModel) {
+                    const activation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds')
+                    console.log(activation)
+                } else {
+                    console.log("できまちぇん!")
+                    console.log(mobileNetModel)
+                }
 
                 break;
-            case "select3":
-                console.log("select3")
-                break;
-            case "select4":
-                console.log("select4")
-                break;
+            // case "select3":
+            //     console.log("select3")
+            //     break;
+            // case "select4":
+            //     console.log("select4")
+            //     break;
         }
         switch (opponent) {
             case "select1":
@@ -121,12 +123,12 @@ export default function analyzeVideo() {
             case "select2":
                 console.log("select2")
                 break;
-            case "select3":
-                console.log("select3")
-                break;
-            case "select4":
-                console.log("select4")
-                break;
+            // case "select3":
+            //     console.log("select3")
+            //     break;
+            // case "select4":
+            //     console.log("select4")
+            //     break;
         }
         // if (canvasRef.current) {
         //     canvasRef.current.style.pointerEvents = 'auto';
@@ -138,7 +140,8 @@ export default function analyzeVideo() {
         const modelLoad = async () => {
             console.log("モデルロード開始")
             await tf.ready()
-            // mobileNetModel = await mobileNetModelLoad()
+            const mobileNetModel = await mobileNetModelLoad()
+            setMobileNetModel(mobileNetModel)
             moveNetModel = await moveNetModelLoad()
             // blazePoseModel = await blazePoseModelLoad()
             console.log("モデルロード終了")
@@ -148,7 +151,10 @@ export default function analyzeVideo() {
 
     const handleBoolean = () => {
         handlePlayBoolean = false
+        console.log(mobileNetModel)
+        console.log(moveNetModel)
     }
+
 
     return (
         <>
