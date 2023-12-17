@@ -28,7 +28,7 @@ export default function analyzeVideo() {
     const canvasRef4 = useRef<HTMLCanvasElement>(null);
     const [myself, setMyself] = useRecoilState(myselfState)
     const [opponent, setOpponent] = useRecoilState(opponentState)
-    const [mobileNetModel, setMobileNetModel] = useState<mobilenet.MobileNet>()
+    const [mobileNetModel, setMobileNetModel] = useState<mobilenet.MobileNet | null>(null)
     const classifier = knnClassifier.create();
     let moveNetModel: poseDetection.PoseDetector
     // let blazePoseModel
@@ -104,6 +104,8 @@ export default function analyzeVideo() {
                     const activation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds')
                     console.log(activation)
                     classifier.addExample(activation, 2)
+                    classifier.addExample(activation, 2)
+                    classifier.addExample(activation, 2)
                 }
                 break;
             // case "select3":
@@ -116,6 +118,11 @@ export default function analyzeVideo() {
         switch (opponent) {
             case "select1":
                 console.log("select1")
+                if (mobileNetModel) {
+                    const activation = (mobileNetModel as any).infer(canvasRef1.current, 'conv_preds')
+                    console.log(activation)
+                    classifier.addExample(activation, 1)
+                }
                 break;
             case "select2":
                 console.log("select2")
@@ -147,9 +154,24 @@ export default function analyzeVideo() {
     }
 
     const handleBoolean = () => {
-        handlePlayBoolean = false
-        console.log(mobileNetModel)
-        console.log(moveNetModel)
+
+        const bunnseki = async () => {
+            console.log("開始する！？")
+            if (mobileNetModel) {
+                console.log("開始する")
+                const activation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds')
+                console.log(activation)
+                const resultTL: any = await classifier.predictClass(activation)
+                console.log(resultTL)
+            } else {
+                console.log("できません")
+            }
+        }
+        bunnseki()
+    }
+
+    const handleExample = () => {
+
     }
 
 
@@ -178,7 +200,8 @@ export default function analyzeVideo() {
             <ExampleForm />
             <Form />
             <button onClick={handleModelLoad}>分析モデルをロードする</button>
-            <button onClick={handleBoolean}>真偽値をリセット</button>
+            <button onClick={handleExample}>学習ボタン~~~</button>
+            <button onClick={handleBoolean}>解析ボタン~~~~</button>
         </>
     )
 }
