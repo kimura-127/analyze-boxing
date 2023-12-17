@@ -12,9 +12,8 @@ import { drawSkeleton } from "@/utils/drawSkeleton";
 import { myselfState } from "@/atoms/myselfState";
 import { opponentState } from "@/atoms/opponentState";
 import ExampleForm from "../components/ExampleForm";
-import { Tensor3D } from '@tensorflow/tfjs-core';
 import { drawExample } from "@/utils/drawExample";
-
+import * as knnClassifier from '@tensorflow-models/knn-classifier';
 
 
 
@@ -30,6 +29,7 @@ export default function analyzeVideo() {
     const [myself, setMyself] = useRecoilState(myselfState)
     const [opponent, setOpponent] = useRecoilState(opponentState)
     const [mobileNetModel, setMobileNetModel] = useState<mobilenet.MobileNet>()
+    const classifier = knnClassifier.create();
     let moveNetModel: poseDetection.PoseDetector
     // let blazePoseModel
     let ctx: any
@@ -103,11 +103,8 @@ export default function analyzeVideo() {
                 if (mobileNetModel) {
                     const activation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds')
                     console.log(activation)
-                } else {
-                    console.log("できまちぇん!")
-                    console.log(mobileNetModel)
+                    classifier.addExample(activation, 2)
                 }
-
                 break;
             // case "select3":
             //     console.log("select3")
