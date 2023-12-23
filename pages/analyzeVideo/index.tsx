@@ -15,6 +15,7 @@ import ExampleForm from "../components/ExampleForm";
 import { drawExample } from "@/utils/drawExample";
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
 import { croppedImage } from "@/utils/croppedImage";
+import { Tensor3D } from '@tensorflow/tfjs-core';
 
 
 
@@ -79,6 +80,11 @@ export default function analyzeVideo() {
                     const activation = (mobileNetModel as any).infer(croppedImageData[0], 'conv_preds')
                     const resultTL: any = await classifier.predictClass(activation)
                     console.log("FPS")
+                }
+                if (blazePoseModel) {
+                    const squeezedImage: Tensor3D = tf.squeeze(croppedImageData[0], [0]);
+                    const result = await blazePoseModel.estimatePoses(squeezedImage)
+                    console.log(result)
                 }
                 videoElement?.paused || requestAnimationFrame(animate);
             }
