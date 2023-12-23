@@ -14,6 +14,7 @@ import { opponentState } from "@/atoms/opponentState";
 import ExampleForm from "../components/ExampleForm";
 import { drawExample } from "@/utils/drawExample";
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
+import { croppedImage } from "@/utils/croppedImage";
 
 
 
@@ -32,14 +33,11 @@ export default function analyzeVideo() {
     const [opponent, setOpponent] = useRecoilState(opponentState)
     const [mobileNetModel, setMobileNetModel] = useState<mobilenet.MobileNet | null>(null)
     const [moveNetModel, setMoveNetModel] = useState<poseDetection.PoseDetector | null>(null)
-    // let mobileNetModel: any
+    const [blazePoseModel, setBlazePoseModel] = useState<poseDetection.PoseDetector>()
     const classifier = knnClassifier.create();
-    // let moveNetModel: poseDetection.PoseDetector
-    // let blazePoseModel
     const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null)
-    // let ctx: any
-    let example1Ctx: any
-    let example2Ctx: any
+    const [example1Ctx, setExample1Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
+    const [example2Ctx, setExample2Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
 
 
 
@@ -49,8 +47,11 @@ export default function analyzeVideo() {
         const canvasElement = canvasRef.current
         const example1CanvasElement = canvasRef1.current
         const example2CanvasElement = canvasRef2.current
-        example1Ctx = example1CanvasElement?.getContext('2d')
-        example2Ctx = example2CanvasElement?.getContext('2d')
+        const example1Ctx = example1CanvasElement?.getContext('2d')
+        const example2Ctx = example2CanvasElement?.getContext('2d')
+
+        setExample1Ctx(example1Ctx)
+        setExample2Ctx(example2Ctx)
 
 
         if (!handlePlayBoolean && moveNetModel && videoElement) {
@@ -66,27 +67,23 @@ export default function analyzeVideo() {
         } else if (moveNetModel && videoElement) {
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
+                const croppedImageData = await croppedImage(videoElement, poses)
                 const person_1 = await poses[0]
                 const person_2 = await poses[1]
-                console.log(mobileNetModel)
                 canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
                 drawSkeleton(ctx, videoElement, person_1)
                 drawSkeleton(ctx, videoElement, person_2)
                 drawExample(videoElement, poses[0], example1Ctx)
                 drawExample(videoElement, poses[1], example2Ctx)
                 if (mobileNetModel) {
-                    const activation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds')
+                    const activation = (mobileNetModel as any).infer(croppedImageData[0], 'conv_preds')
                     const resultTL: any = await classifier.predictClass(activation)
-                    console.log(resultTL)
-                    // console.log("できる！")
-                } else {
-                    console.log("できない")
+                    console.log("FPS")
                 }
-
                 videoElement?.paused || requestAnimationFrame(animate);
             }
             requestAnimationFrame(animate)
-        } else { console.log("ないない", moveNetModel) }
+        }
 
     };
 
@@ -151,7 +148,8 @@ export default function analyzeVideo() {
             setMobileNetModel(mobileNetModel)
             const moveNetModel = await moveNetModelLoad()
             setMoveNetModel(moveNetModel)
-            // blazePoseModel = await blazePoseModelLoad()
+            const blazePoseModel = await blazePoseModelLoad()
+            setBlazePoseModel(blazePoseModel)
             console.log("モデルロード終了")
         }
         const videoElement = videoRef.current
