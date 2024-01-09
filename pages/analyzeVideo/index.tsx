@@ -5,7 +5,7 @@ import { blazePoseModelLoad } from "@/utils/blazePoseModelLoad";
 import { useEffect, useRef, useState } from "react";
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import * as mobilenet from '@tensorflow-models/mobilenet';
-import * as tf from '@tensorflow/tfjs-core';
+import * as tf from '@tensorflow/tfjs';
 import { useRecoilState } from "recoil";
 import { videoSrcState } from "@/atoms/videoSrcState";
 import { drawSkeleton } from "@/utils/drawSkeleton";
@@ -39,6 +39,8 @@ export default function analyzeVideo() {
     const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null)
     const [example1Ctx, setExample1Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
     const [example2Ctx, setExample2Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
+
+
 
 
 
@@ -79,11 +81,11 @@ export default function analyzeVideo() {
                 if (mobileNetModel) {
                     const activation = (mobileNetModel as any).infer(croppedImageData[0], 'conv_preds')
                     const resultTL: any = await classifier.predictClass(activation)
-                    console.log("FPS")
+                    // console.log("FPS")
                 }
                 if (blazePoseModel) {
-                    const squeezedImage: Tensor3D = tf.squeeze(croppedImageData[0], [0]);
-                    const result = await blazePoseModel.estimatePoses(squeezedImage)
+                    const squeezedImage = tf.squeeze(croppedImageData[0] as any, [0])
+                    const result = await blazePoseModel.estimatePoses(squeezedImage as any)
                     console.log(result)
                 }
                 videoElement?.paused || requestAnimationFrame(animate);
@@ -156,6 +158,20 @@ export default function analyzeVideo() {
             setMoveNetModel(moveNetModel)
             const blazePoseModel = await blazePoseModelLoad()
             setBlazePoseModel(blazePoseModel)
+
+            const inputSize = 100;  // 入力シーケンスの長さ
+            const outputSize = 10;  // 出力の次元数
+            const lstmUnits = 50;   // LSTMユニットの数
+            const lstmModel = createLSTMModel(inputSize, outputSize, lstmUnits);
+
+            const learningRate = 0.001;
+            const optimizer = tf.train.adam(learningRate);
+            lstmModel.compile({
+                optimizer: optimizer,
+                loss: 'categoricalCrossentropy',
+                metrics: ['accuracy']
+            });
+
             console.log("モデルロード終了")
         }
         const videoElement = videoRef.current
@@ -186,6 +202,22 @@ export default function analyzeVideo() {
     const handleExample = () => {
         console.log(moveNetModel)
     }
+
+    const createLSTMModel = (inputSize: any, outputSize: any, lstmUnits: any) => {
+        const model = tf.sequential();
+
+        // LSTMレイヤーの追加
+        model.add(tf.layers.lstm({
+            units: lstmUnits,
+            inputShape: [inputSize, outputSize]
+        }));
+
+        // 出力レイヤーの追加
+        model.add(tf.layers.dense({ units: outputSize, activation: 'softmax' }));
+
+        return model;
+    }
+
 
 
     return (
