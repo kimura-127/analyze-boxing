@@ -39,6 +39,10 @@ export default function analyzeVideo() {
     const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null)
     const [example1Ctx, setExample1Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
     const [example2Ctx, setExample2Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
+    const [lstmModel, setLstmModel] = useState<tf.Sequential>()
+    const [xTrain, setXTrain] = useState<tf.Tensor3D>()
+    const [xTestTrain, setXTestTrain] = useState<tf.Tensor3D>()
+    const [yTrain, setYTrain] = useState<tf.Tensor2D>()
 
 
 
@@ -152,12 +156,14 @@ export default function analyzeVideo() {
         const modelLoad = async () => {
             console.log("モデルロード開始")
             await tf.ready()
-            const mobileNetModel = await mobilenet.load()
-            setMobileNetModel(mobileNetModel)
-            const moveNetModel = await moveNetModelLoad()
-            setMoveNetModel(moveNetModel)
-            const blazePoseModel = await blazePoseModelLoad()
-            setBlazePoseModel(blazePoseModel)
+            // const mobileNetModel = await mobilenet.load()
+            // setMobileNetModel(mobileNetModel)
+            // const moveNetModel = await moveNetModelLoad()
+            // setMoveNetModel(moveNetModel)
+            // const blazePoseModel = await blazePoseModelLoad()
+            // setBlazePoseModel(blazePoseModel)
+
+
 
             // const inputSize = 100;  // 入力シーケンスの長さ
             // const outputSize = 10;  // 出力の次元数
@@ -171,6 +177,14 @@ export default function analyzeVideo() {
             //     loss: 'categoricalCrossentropy',
             //     metrics: ['accuracy']
             // });
+
+            const xTrain = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
+            const yTrain = tf.tensor2d([10], [numSamples, outputSize]);
+            const testData = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
+
+            setXTrain(xTrain)
+            setYTrain(yTrain)
+            setXTestTrain(testData)
 
             console.log("モデルロード終了")
         }
@@ -186,6 +200,13 @@ export default function analyzeVideo() {
             videoElement.height = videoElement.videoHeight;
         }
     }
+
+    const inputSize = 1; // 入力シーケンスの長さを1に変更
+    const featureSize = 10; // サンプル内の特徴量の数
+    const outputSize = 1; // 出力の次元数を1に変更
+    const lstmUnits = 50;   // LSTMユニットの数
+    const numSamples = 1; // サンプル数
+
 
 
     const createLSTMModel = (inputSize: any, featureSize: any, outputSize: any, lstmUnits: any) => {
@@ -208,18 +229,11 @@ export default function analyzeVideo() {
     }
 
 
-    const handleTrain = () => {
-        console.log("学習開始")
-        // const inputSize = 100;  // 入力シーケンスの長さ
-        // const featureSize = 3;  // 特徴量の数
-        // const outputSize = 10;  // 出力の次元数
-
-        const inputSize = 1; // 入力シーケンスの長さを1に変更
-        const featureSize = 1; // 特徴量の数を1に変更
-        const outputSize = 1; // 出力の次元数を1に変更
-        const lstmUnits = 50;   // LSTMユニットの数
+    const handleLstmLoad = () => {
+        console.log("モデルロード開始開始")
 
         const lstmModel = createLSTMModel(inputSize, featureSize, outputSize, lstmUnits);
+        setLstmModel(lstmModel)
 
         const learningRate = 0.001;
         const optimizer = tf.train.adam(learningRate);
@@ -232,38 +246,34 @@ export default function analyzeVideo() {
             metrics: ['accuracy']
         });
 
-        // const xTrain = [[1], [1], [1]]
-        // const yTrain = 1
-        // lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 32 });
 
-        const numSamples = 3; // サンプル数
-        const xTrain = tf.tensor3d([[[1]], [[1]], [[1]]], [numSamples, inputSize, featureSize]);
-        const yTrain = tf.tensor2d([[1], [1], [1]], [numSamples, outputSize]);
+
 
         // lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 32 });
-        lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 1 }); // batchSizeを1に変更
+        if (xTrain && yTrain) {
+            lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 1 }); // batchSizeを1に変更
+        }
 
-        console.log("学習終わり")
-
-        const testData = tf.tensor3d([[[1]], [[1]], [[1]]], [numSamples, inputSize, featureSize]);
-        const prediction: any = lstmModel.predict(testData);
-        prediction.array().then((array: any) => {
-            console.log(array); // この配列には、予測された値が含まれます。
-        });
-
-        // console.log(prediction.array())
-
-
-
-
+        console.log("モデルロード終わり")
     }
 
-    const handleBoolean = () => {
-
-
+    const handleTrain = () => {
+        // lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 32 });
+        if (lstmModel && xTrain && yTrain) {
+            console.log("学習開始")
+            lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 1 }); // batchSizeを1に変更
+            console.log("学習終了")
+        }
     }
 
-
+    const handlePredict = () => {
+        if (lstmModel && xTestTrain) {
+            const prediction: any = lstmModel.predict(xTestTrain);
+            prediction.array().then((array: any) => {
+                console.log(array); // この配列には、予測された値が含まれます。
+            });
+        }
+    }
 
 
     return (
@@ -292,8 +302,9 @@ export default function analyzeVideo() {
             <ExampleForm />
             <Form />
             <button onClick={handleModelLoad}>分析モデルをロードする</button>
+            <button onClick={handleLstmLoad}>LSTMモデルロードボタン</button>
             <button onClick={handleTrain}>LSTMモデル学習ボタン</button>
-            <button onClick={handleBoolean}>LSTMモデル推定ボタン</button>
+            <button onClick={handlePredict}>LSTM推定ボタン</button>
         </>
     )
 }
