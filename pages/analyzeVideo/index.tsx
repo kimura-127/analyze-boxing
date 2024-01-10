@@ -159,18 +159,18 @@ export default function analyzeVideo() {
             const blazePoseModel = await blazePoseModelLoad()
             setBlazePoseModel(blazePoseModel)
 
-            const inputSize = 100;  // 入力シーケンスの長さ
-            const outputSize = 10;  // 出力の次元数
-            const lstmUnits = 50;   // LSTMユニットの数
-            const lstmModel = createLSTMModel(inputSize, outputSize, lstmUnits);
+            // const inputSize = 100;  // 入力シーケンスの長さ
+            // const outputSize = 10;  // 出力の次元数
+            // const lstmUnits = 50;   // LSTMユニットの数
+            // const lstmModel = createLSTMModel(inputSize, outputSize, lstmUnits);
 
-            const learningRate = 0.001;
-            const optimizer = tf.train.adam(learningRate);
-            lstmModel.compile({
-                optimizer: optimizer,
-                loss: 'categoricalCrossentropy',
-                metrics: ['accuracy']
-            });
+            // const learningRate = 0.001;
+            // const optimizer = tf.train.adam(learningRate);
+            // lstmModel.compile({
+            //     optimizer: optimizer,
+            //     loss: 'categoricalCrossentropy',
+            //     metrics: ['accuracy']
+            // });
 
             console.log("モデルロード終了")
         }
@@ -187,36 +187,82 @@ export default function analyzeVideo() {
         }
     }
 
-    const handleBoolean = () => {
 
-        const bunnseki = async () => {
-            if (mobileNetModel) {
-                const activation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds')
-                const resultTL: any = await classifier.predictClass(activation)
-                console.log(resultTL)
-            }
-        }
-        bunnseki()
-    }
-
-    const handleExample = () => {
-        console.log(moveNetModel)
-    }
-
-    const createLSTMModel = (inputSize: any, outputSize: any, lstmUnits: any) => {
+    const createLSTMModel = (inputSize: any, featureSize: any, outputSize: any, lstmUnits: any) => {
         const model = tf.sequential();
 
         // LSTMレイヤーの追加
         model.add(tf.layers.lstm({
             units: lstmUnits,
-            inputShape: [inputSize, outputSize]
+            inputShape: [inputSize, featureSize]
         }));
 
         // 出力レイヤーの追加
-        model.add(tf.layers.dense({ units: outputSize, activation: 'softmax' }));
+        model.add(tf.layers.dense({
+            units: outputSize, activation:
+                //  'softmax' 
+                'sigmoid'
+        }));
 
         return model;
     }
+
+
+    const handleTrain = () => {
+        console.log("学習開始")
+        // const inputSize = 100;  // 入力シーケンスの長さ
+        // const featureSize = 3;  // 特徴量の数
+        // const outputSize = 10;  // 出力の次元数
+
+        const inputSize = 1; // 入力シーケンスの長さを1に変更
+        const featureSize = 1; // 特徴量の数を1に変更
+        const outputSize = 1; // 出力の次元数を1に変更
+        const lstmUnits = 50;   // LSTMユニットの数
+
+        const lstmModel = createLSTMModel(inputSize, featureSize, outputSize, lstmUnits);
+
+        const learningRate = 0.001;
+        const optimizer = tf.train.adam(learningRate);
+        lstmModel.compile({
+            optimizer: optimizer,
+            loss:
+                // 'categoricalCrossentropy'
+                'binaryCrossentropy'
+            ,
+            metrics: ['accuracy']
+        });
+
+        // const xTrain = [[1], [1], [1]]
+        // const yTrain = 1
+        // lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 32 });
+
+        const numSamples = 3; // サンプル数
+        const xTrain = tf.tensor3d([[[1]], [[1]], [[1]]], [numSamples, inputSize, featureSize]);
+        const yTrain = tf.tensor2d([[1], [1], [1]], [numSamples, outputSize]);
+
+        // lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 32 });
+        lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 1 }); // batchSizeを1に変更
+
+        console.log("学習終わり")
+
+        const testData = tf.tensor3d([[[1]], [[1]], [[1]]], [numSamples, inputSize, featureSize]);
+        const prediction: any = lstmModel.predict(testData);
+        prediction.array().then((array: any) => {
+            console.log(array); // この配列には、予測された値が含まれます。
+        });
+
+        // console.log(prediction.array())
+
+
+
+
+    }
+
+    const handleBoolean = () => {
+
+
+    }
+
 
 
 
@@ -246,8 +292,8 @@ export default function analyzeVideo() {
             <ExampleForm />
             <Form />
             <button onClick={handleModelLoad}>分析モデルをロードする</button>
-            <button onClick={handleExample}>学習ボタン~~~</button>
-            <button onClick={handleBoolean}>解析ボタン~~~~</button>
+            <button onClick={handleTrain}>LSTMモデル学習ボタン</button>
+            <button onClick={handleBoolean}>LSTMモデル推定ボタン</button>
         </>
     )
 }
