@@ -41,8 +41,11 @@ export default function analyzeVideo() {
     const [example2Ctx, setExample2Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
     const [lstmModel, setLstmModel] = useState<tf.Sequential>()
     const [xTrain, setXTrain] = useState<tf.Tensor3D>()
-    const [xTestTrain, setXTestTrain] = useState<tf.Tensor3D>()
+    const [xPredict, setXPredict] = useState<tf.Tensor3D>()
     const [yTrain, setYTrain] = useState<tf.Tensor2D>()
+    const [xTestTrain, setTestXTrain] = useState<tf.Tensor3D>()
+    const [xTestPredict, setXTestPredict] = useState<tf.Tensor3D>()
+    const [yTestTrain, setYTestTrain] = useState<tf.Tensor2D>()
 
 
 
@@ -178,13 +181,21 @@ export default function analyzeVideo() {
             //     metrics: ['accuracy']
             // });
 
-            const xTrain = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
-            const yTrain = tf.tensor2d([[0, 1]], [numSamples, outputSize]);
-            const testData = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
+            const xTrain = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]], [numSamples, inputSize, featureSize]);
+            const yTrain = tf.tensor2d([[1, 0, 0], [0, 1, 0], [0, 0, 1]], [numSamples, outputSize]);
+            const predict = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]], [numSamples, inputSize, featureSize]);
+
+            // const xTestTrain = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
+            const yTestTrain = tf.tensor2d([[1, 0, 0], [0, 1, 0], [0, 0, 1]], [numSamples, outputSize]);
+            const testPredict = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]], [numSamples, inputSize, featureSize]);
 
             setXTrain(xTrain)
             setYTrain(yTrain)
-            setXTestTrain(testData)
+            setXPredict(predict)
+
+            setTestXTrain(xTestTrain)
+            setYTestTrain(yTestTrain)
+            setXTestPredict(testPredict)
 
             console.log("モデルロード終了")
         }
@@ -201,11 +212,11 @@ export default function analyzeVideo() {
         }
     }
 
-    const inputSize = 2; // 入力シーケンスの長さを1に変更
+    const inputSize = 1; // シーケンス長 []の数
     const featureSize = 10; // サンプル内の特徴量の数
-    const outputSize = 2; // 出力の次元数を1に変更
+    const outputSize = 3; // 出力の次元数
     const lstmUnits = 50;   // LSTMユニットの数
-    const numSamples = 1; // サンプル数
+    const numSamples = 3; // サンプル数,データの総数のこと
 
 
 
@@ -221,8 +232,8 @@ export default function analyzeVideo() {
         // 出力レイヤーの追加
         model.add(tf.layers.dense({
             units: outputSize, activation:
-                // 'softmax'
-                'sigmoid'
+                'softmax'
+            // 'sigmoid'
         }));
 
         return model;
@@ -240,8 +251,9 @@ export default function analyzeVideo() {
         lstmModel.compile({
             optimizer: optimizer,
             loss:
-                // 'categoricalCrossentropy'
-                'binaryCrossentropy'
+                'categoricalCrossentropy' //多クラス分類のための損失関数 ※ワンホットエンコーディング必須
+            // 'sparseCategoricalCrossentropy' //多クラス分類のための損失関数
+            // 'binaryCrossentropy' //二値分類のための損失関数
             ,
             metrics: ['accuracy']
         });
@@ -250,9 +262,9 @@ export default function analyzeVideo() {
 
 
         // lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 32 });
-        if (xTrain && yTrain) {
-            lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 1 }); // batchSizeを1に変更
-        }
+        // if (xTrain && yTrain) {
+        //     lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 1 }); // batchSizeを1に変更
+        // }
 
         console.log("モデルロード終わり")
     }
@@ -261,33 +273,29 @@ export default function analyzeVideo() {
         // lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 32 });
         if (lstmModel && xTrain && yTrain) {
             console.log("学習開始")
-            lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 1 }); // batchSizeを1に変更
+            lstmModel.fit(xTrain, yTrain, { epochs: 20, batchSize: 1 }); // batchSizeを1に変更
             console.log("学習終了")
         }
     }
 
-    const handle0train = () => {
-        const x0Train = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
-        const y0Train = tf.tensor2d([2], [numSamples, outputSize]);
-
-        if (lstmModel) {
-            lstmModel.fit(x0Train, y0Train, { epochs: 10, batchSize: 1 }); // batchSizeを1に変更
+    const handleTestTrain = () => {
+        if (lstmModel && xTestTrain && yTestTrain) {
+            lstmModel.fit(xTestTrain, yTestTrain, { epochs: 10, batchSize: 1 }); // batchSizeを1に変更
         }
     }
 
     const handlePredict = () => {
-        if (lstmModel && xTestTrain) {
-            const prediction: any = lstmModel.predict(xTestTrain);
+        if (lstmModel && xPredict) {
+            const prediction: any = lstmModel.predict(xPredict);
             prediction.array().then((array: any) => {
                 console.log(array); // この配列には、予測された値が含まれます。
             });
         }
     }
 
-    const handle0predict = () => {
-        const test0Data = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
-        if (lstmModel) {
-            const prediction: any = lstmModel.predict(test0Data);
+    const handleTestPredict = () => {
+        if (lstmModel && xTestPredict) {
+            const prediction: any = lstmModel.predict(xTestPredict);
             prediction.array().then((array: any) => {
                 console.log(array); // この配列には、予測された値が含まれます。
             });
@@ -323,9 +331,9 @@ export default function analyzeVideo() {
             <button onClick={handleModelLoad}>分析モデルをロードする</button>
             <button onClick={handleLstmLoad}>LSTMモデルロードボタン</button>
             <button onClick={handleTrain}>LSTMモデル学習ボタン</button>
-            <button onClick={handle0train}>LSTM0モデル学習ボタン</button>
+            <button onClick={handleTestTrain}>LSTM0モデル学習ボタン</button>
             <button onClick={handlePredict}>LSTM推定ボタン</button>
-            <button onClick={handle0predict}>lstm0の追定ボタン</button>
+            <button onClick={handleTestPredict}>lstm0の追定ボタン</button>
         </>
     )
 }
