@@ -178,9 +178,9 @@ export default function analyzeVideo() {
             //     metrics: ['accuracy']
             // });
 
-            const xTrain = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
-            const yTrain = tf.tensor2d([10], [numSamples, outputSize]);
-            const testData = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
+            const xTrain = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
+            const yTrain = tf.tensor2d([[0, 1]], [numSamples, outputSize]);
+            const testData = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
 
             setXTrain(xTrain)
             setYTrain(yTrain)
@@ -201,9 +201,9 @@ export default function analyzeVideo() {
         }
     }
 
-    const inputSize = 1; // 入力シーケンスの長さを1に変更
+    const inputSize = 2; // 入力シーケンスの長さを1に変更
     const featureSize = 10; // サンプル内の特徴量の数
-    const outputSize = 1; // 出力の次元数を1に変更
+    const outputSize = 2; // 出力の次元数を1に変更
     const lstmUnits = 50;   // LSTMユニットの数
     const numSamples = 1; // サンプル数
 
@@ -221,7 +221,7 @@ export default function analyzeVideo() {
         // 出力レイヤーの追加
         model.add(tf.layers.dense({
             units: outputSize, activation:
-                //  'softmax' 
+                // 'softmax'
                 'sigmoid'
         }));
 
@@ -266,9 +266,28 @@ export default function analyzeVideo() {
         }
     }
 
+    const handle0train = () => {
+        const x0Train = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
+        const y0Train = tf.tensor2d([2], [numSamples, outputSize]);
+
+        if (lstmModel) {
+            lstmModel.fit(x0Train, y0Train, { epochs: 10, batchSize: 1 }); // batchSizeを1に変更
+        }
+    }
+
     const handlePredict = () => {
         if (lstmModel && xTestTrain) {
             const prediction: any = lstmModel.predict(xTestTrain);
+            prediction.array().then((array: any) => {
+                console.log(array); // この配列には、予測された値が含まれます。
+            });
+        }
+    }
+
+    const handle0predict = () => {
+        const test0Data = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
+        if (lstmModel) {
+            const prediction: any = lstmModel.predict(test0Data);
             prediction.array().then((array: any) => {
                 console.log(array); // この配列には、予測された値が含まれます。
             });
@@ -304,7 +323,9 @@ export default function analyzeVideo() {
             <button onClick={handleModelLoad}>分析モデルをロードする</button>
             <button onClick={handleLstmLoad}>LSTMモデルロードボタン</button>
             <button onClick={handleTrain}>LSTMモデル学習ボタン</button>
+            <button onClick={handle0train}>LSTM0モデル学習ボタン</button>
             <button onClick={handlePredict}>LSTM推定ボタン</button>
+            <button onClick={handle0predict}>lstm0の追定ボタン</button>
         </>
     )
 }
