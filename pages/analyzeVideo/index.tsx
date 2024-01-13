@@ -15,7 +15,9 @@ import ExampleForm from "../components/ExampleForm";
 import { drawExample } from "@/utils/drawExample";
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
 import { croppedImage } from "@/utils/croppedImage";
+import { knnClassifierPredict } from "@/utils/knnClassifierPredict";
 import { Tensor3D } from '@tensorflow/tfjs-core';
+import { Tensor4D } from '@tensorflow/tfjs-core';
 
 
 
@@ -43,12 +45,7 @@ export default function analyzeVideo() {
     const [xTrain, setXTrain] = useState<tf.Tensor3D>()
     const [xPredict, setXPredict] = useState<tf.Tensor3D>()
     const [yTrain, setYTrain] = useState<tf.Tensor2D>()
-    const [xTestTrain, setTestXTrain] = useState<tf.Tensor3D>()
     const [xTestPredict, setXTestPredict] = useState<tf.Tensor3D>()
-    const [yTestTrain, setYTestTrain] = useState<tf.Tensor2D>()
-
-
-
 
 
 
@@ -78,22 +75,38 @@ export default function analyzeVideo() {
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
                 const croppedImageData = await croppedImage(videoElement, poses)
-                const person_1 = await poses[0]
-                const person_2 = await poses[1]
+                const person_1 = poses[0]
+                const person_2 = poses[1]
                 canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
                 drawSkeleton(ctx, videoElement, person_1)
                 drawSkeleton(ctx, videoElement, person_2)
-                drawExample(videoElement, poses[0], example1Ctx)
-                drawExample(videoElement, poses[1], example2Ctx)
                 if (mobileNetModel) {
-                    const activation = (mobileNetModel as any).infer(croppedImageData[0], 'conv_preds')
-                    const resultTL: any = await classifier.predictClass(activation)
-                    // console.log("FPS")
+
+                    // const knnClass = async (croppedImageData: Tensor4D) => {
+                    //     const activation = (mobileNetModel as any).infer(croppedImageData, 'conv_preds')
+                    //     const result: any = await classifier.predictClass(activation)
+                    //     return result
+                    // }
+
+                    // const result_1 = await knnClassifierPredict(mobileNetModel, croppedImageData[0], classifier)
+                    // const result_2 = await knnClassifierPredict(mobileNetModel, croppedImageData[1], classifier)
+                    // console.log(result_1)
+
+                    knnClassifierPredict(mobileNetModel, croppedImageData[0], classifier).then((result) => {
+                        switch (result) {
+                            case 0:
+                                console.log(0)
+                                break;
+                            case 1:
+                                console.log(1)
+                                break;
+                        }
+                    })
                 }
                 if (blazePoseModel) {
-                    const squeezedImage = tf.squeeze(croppedImageData[0] as any, [0])
-                    const result = await blazePoseModel.estimatePoses(squeezedImage as any)
-                    console.log(result)
+                    // const squeezedImage = tf.squeeze(croppedImageData[0] as any, [0])
+                    // const result = await blazePoseModel.estimatePoses(squeezedImage as any)
+                    // console.log(result)
                 }
                 videoElement?.paused || requestAnimationFrame(animate);
             }
@@ -159,42 +172,24 @@ export default function analyzeVideo() {
         const modelLoad = async () => {
             console.log("モデルロード開始")
             await tf.ready()
-            // const mobileNetModel = await mobilenet.load()
-            // setMobileNetModel(mobileNetModel)
-            // const moveNetModel = await moveNetModelLoad()
-            // setMoveNetModel(moveNetModel)
-            // const blazePoseModel = await blazePoseModelLoad()
-            // setBlazePoseModel(blazePoseModel)
+            const mobileNetModel = await mobilenet.load()
+            setMobileNetModel(mobileNetModel)
+            const moveNetModel = await moveNetModelLoad()
+            setMoveNetModel(moveNetModel)
+            const blazePoseModel = await blazePoseModelLoad()
+            setBlazePoseModel(blazePoseModel)
 
-
-
-            // const inputSize = 100;  // 入力シーケンスの長さ
-            // const outputSize = 10;  // 出力の次元数
-            // const lstmUnits = 50;   // LSTMユニットの数
-            // const lstmModel = createLSTMModel(inputSize, outputSize, lstmUnits);
-
-            // const learningRate = 0.001;
-            // const optimizer = tf.train.adam(learningRate);
-            // lstmModel.compile({
-            //     optimizer: optimizer,
-            //     loss: 'categoricalCrossentropy',
-            //     metrics: ['accuracy']
-            // });
 
             const xTrain = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]], [numSamples, inputSize, featureSize]);
             const yTrain = tf.tensor2d([[1, 0, 0], [0, 1, 0], [0, 0, 1]], [numSamples, outputSize]);
             const predict = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]], [numSamples, inputSize, featureSize]);
 
-            // const xTestTrain = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
-            const yTestTrain = tf.tensor2d([[1, 0, 0], [0, 1, 0], [0, 0, 1]], [numSamples, outputSize]);
             const testPredict = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]], [numSamples, inputSize, featureSize]);
 
             setXTrain(xTrain)
             setYTrain(yTrain)
             setXPredict(predict)
 
-            setTestXTrain(xTestTrain)
-            setYTestTrain(yTestTrain)
             setXTestPredict(testPredict)
 
             console.log("モデルロード終了")
@@ -214,7 +209,7 @@ export default function analyzeVideo() {
 
     const inputSize = 1; // シーケンス長 []の数
     const featureSize = 10; // サンプル内の特徴量の数
-    const outputSize = 3; // 出力の次元数
+    const outputSize = 3; // 出力の次元数,numSamplesと同じ値にすること
     const lstmUnits = 50;   // LSTMユニットの数
     const numSamples = 3; // サンプル数,データの総数のこと
 
@@ -259,18 +254,10 @@ export default function analyzeVideo() {
         });
 
 
-
-
-        // lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 32 });
-        // if (xTrain && yTrain) {
-        //     lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 1 }); // batchSizeを1に変更
-        // }
-
         console.log("モデルロード終わり")
     }
 
     const handleTrain = () => {
-        // lstmModel.fit(xTrain, yTrain, { epochs: 10, batchSize: 32 });
         if (lstmModel && xTrain && yTrain) {
             console.log("学習開始")
             lstmModel.fit(xTrain, yTrain, { epochs: 20, batchSize: 1 }); // batchSizeを1に変更
@@ -278,11 +265,6 @@ export default function analyzeVideo() {
         }
     }
 
-    const handleTestTrain = () => {
-        if (lstmModel && xTestTrain && yTestTrain) {
-            lstmModel.fit(xTestTrain, yTestTrain, { epochs: 10, batchSize: 1 }); // batchSizeを1に変更
-        }
-    }
 
     const handlePredict = () => {
         if (lstmModel && xPredict) {
@@ -331,7 +313,6 @@ export default function analyzeVideo() {
             <button onClick={handleModelLoad}>分析モデルをロードする</button>
             <button onClick={handleLstmLoad}>LSTMモデルロードボタン</button>
             <button onClick={handleTrain}>LSTMモデル学習ボタン</button>
-            <button onClick={handleTestTrain}>LSTM0モデル学習ボタン</button>
             <button onClick={handlePredict}>LSTM推定ボタン</button>
             <button onClick={handleTestPredict}>lstm0の追定ボタン</button>
         </>
