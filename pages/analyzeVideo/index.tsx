@@ -87,13 +87,13 @@ export default function analyzeVideo() {
                         switch (personId) {
                             case 0:
                                 if (hitJudgment) {
-                                    console.log(true, poses.length)
+                                    // console.log(true, poses.length)
                                 } else {
                                     console.log(false, hitJudgment)
                                 }
                                 break;
                             case 1:
-                                console.log(1)
+                                // console.log(1)
                                 break;
                         }
                     })
@@ -121,10 +121,9 @@ export default function analyzeVideo() {
                 console.log("select2")
                 if (mobileNetModel) {
                     const activation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds')
-                    console.log(activation)
-                    classifier.addExample(activation, 2)
-                    classifier.addExample(activation, 2)
-                    classifier.addExample(activation, 2)
+                    classifier.addExample(activation, 1)
+                    classifier.addExample(activation, 1)
+                    classifier.addExample(activation, 1)
                 }
                 break;
             // case "select3":
@@ -139,10 +138,9 @@ export default function analyzeVideo() {
                 console.log("select1")
                 if (mobileNetModel) {
                     const activation = (mobileNetModel as any).infer(canvasRef1.current, 'conv_preds')
-                    console.log(activation)
-                    classifier.addExample(activation, 1)
-                    classifier.addExample(activation, 1)
-                    classifier.addExample(activation, 1)
+                    classifier.addExample(activation, 0)
+                    classifier.addExample(activation, 0)
+                    classifier.addExample(activation, 0)
                 }
                 break;
             case "select2":
@@ -167,10 +165,10 @@ export default function analyzeVideo() {
         const modelLoad = async () => {
             console.log("モデルロード開始")
             await tf.ready()
-            const mobileNetModel = await mobilenet.load()
-            setMobileNetModel(mobileNetModel)
             const moveNetModel = await moveNetModelLoad()
             setMoveNetModel(moveNetModel)
+            const mobileNetModel = await mobilenet.load()
+            setMobileNetModel(mobileNetModel)
             const blazePoseModel = await blazePoseModelLoad()
             setBlazePoseModel(blazePoseModel)
 
