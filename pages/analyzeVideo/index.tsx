@@ -18,6 +18,7 @@ import { croppedImage } from "@/utils/croppedImage";
 import { knnClassifierPredict } from "@/utils/knnClassifierPredict";
 import { Tensor3D } from '@tensorflow/tfjs-core';
 import { Tensor4D } from '@tensorflow/tfjs-core';
+import { hitJudgmentState } from "@/atoms/hitJudgmentState";
 
 
 
@@ -34,6 +35,7 @@ export default function analyzeVideo() {
     const [handlePlayBoolean, setHnadlePlayBoolean] = useState(false)
     const [myself, setMyself] = useRecoilState(myselfState)
     const [opponent, setOpponent] = useRecoilState(opponentState)
+    const [hitJudgment, setHitJudgment] = useRecoilState(hitJudgmentState)
     const [mobileNetModel, setMobileNetModel] = useState<mobilenet.MobileNet | null>(null)
     const [moveNetModel, setMoveNetModel] = useState<poseDetection.PoseDetector | null>(null)
     const [blazePoseModel, setBlazePoseModel] = useState<poseDetection.PoseDetector>()
@@ -74,28 +76,21 @@ export default function analyzeVideo() {
         } else if (moveNetModel && videoElement) {
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
-                const croppedImageData = await croppedImage(videoElement, poses)
-                const person_1 = poses[0]
-                const person_2 = poses[1]
-                canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
-                drawSkeleton(ctx, videoElement, person_1)
-                drawSkeleton(ctx, videoElement, person_2)
-                if (mobileNetModel) {
+                if (poses.length > 0 && mobileNetModel) {
+                    const croppedImageData = await croppedImage(videoElement, poses)
+                    canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                    drawSkeleton(ctx, videoElement, poses[0])
+                    drawSkeleton(ctx, videoElement, poses[1])
 
-                    // const knnClass = async (croppedImageData: Tensor4D) => {
-                    //     const activation = (mobileNetModel as any).infer(croppedImageData, 'conv_preds')
-                    //     const result: any = await classifier.predictClass(activation)
-                    //     return result
-                    // }
 
-                    // const result_1 = await knnClassifierPredict(mobileNetModel, croppedImageData[0], classifier)
-                    // const result_2 = await knnClassifierPredict(mobileNetModel, croppedImageData[1], classifier)
-                    // console.log(result_1)
-
-                    knnClassifierPredict(mobileNetModel, croppedImageData[0], classifier).then((result) => {
-                        switch (result) {
+                    knnClassifierPredict(mobileNetModel, croppedImageData[0], classifier).then((personId) => {
+                        switch (personId) {
                             case 0:
-                                console.log(0)
+                                if (hitJudgment) {
+                                    console.log(true, poses.length)
+                                } else {
+                                    console.log(false, hitJudgment)
+                                }
                                 break;
                             case 1:
                                 console.log(1)
@@ -103,11 +98,11 @@ export default function analyzeVideo() {
                         }
                     })
                 }
-                if (blazePoseModel) {
-                    // const squeezedImage = tf.squeeze(croppedImageData[0] as any, [0])
-                    // const result = await blazePoseModel.estimatePoses(squeezedImage as any)
-                    // console.log(result)
-                }
+                // if (blazePoseModel) {
+                //     const squeezedImage = tf.squeeze(croppedImageData[0] as any, [0])
+                //     const result = await blazePoseModel.estimatePoses(squeezedImage as any)
+                //     console.log(result)
+                // }
                 videoElement?.paused || requestAnimationFrame(animate);
             }
             requestAnimationFrame(animate)
