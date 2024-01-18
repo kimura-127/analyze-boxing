@@ -48,6 +48,7 @@ export default function analyzeVideo() {
     const [xPredict, setXPredict] = useState<tf.Tensor3D>()
     const [yTrain, setYTrain] = useState<tf.Tensor2D>()
     const [xTestPredict, setXTestPredict] = useState<tf.Tensor3D>()
+    const boxerKeypoint: any = []
 
 
 
@@ -76,39 +77,38 @@ export default function analyzeVideo() {
         } else if (moveNetModel && videoElement) {
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
-                if (poses.length > 0 && mobileNetModel) {
-                    const croppedImageData = await croppedImage(videoElement, poses)
+                const croppedImageData = await croppedImage(videoElement, poses)
+                if (poses.length > 0 && mobileNetModel && blazePoseModel) {
+
                     canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
                     drawSkeleton(ctx, videoElement, poses[0])
                     drawSkeleton(ctx, videoElement, poses[1])
 
-
-                    knnClassifierPredict(mobileNetModel, croppedImageData[0], classifier).then((personId) => {
-                        switch (personId) {
-                            case 0:
-                                if (hitJudgment) {
-                                    // console.log(true, poses.length)
-                                } else {
-                                    console.log(false, hitJudgment)
-                                }
-                                break;
-                            case 1:
-                                // console.log(1)
-                                break;
-                        }
-                    })
+                    switch (hitJudgment) {
+                        case true:
+                            croppedImageData.forEach((croppedImage: any) => {
+                                knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, "opponent").then((result) => {
+                                    result && console.log(result)
+                                })
+                            });
+                            break;
+                        case false:
+                            croppedImageData.forEach((croppedImage: any) => {
+                                knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, "myself").then((result) => {
+                                    console.log(result)
+                                })
+                            });
+                            break;
+                    }
                 }
-                // if (blazePoseModel) {
-                //     const squeezedImage = tf.squeeze(croppedImageData[0] as any, [0])
-                //     const result = await blazePoseModel.estimatePoses(squeezedImage as any)
-                //     console.log(result)
-                // }
+
                 videoElement?.paused || requestAnimationFrame(animate);
             }
             requestAnimationFrame(animate)
         }
 
     };
+
 
 
     useEffect(() => {
@@ -121,9 +121,9 @@ export default function analyzeVideo() {
                 console.log("select2")
                 if (mobileNetModel) {
                     const activation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds')
-                    classifier.addExample(activation, 1)
-                    classifier.addExample(activation, 1)
-                    classifier.addExample(activation, 1)
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
                 }
                 break;
             // case "select3":
@@ -138,9 +138,9 @@ export default function analyzeVideo() {
                 console.log("select1")
                 if (mobileNetModel) {
                     const activation = (mobileNetModel as any).infer(canvasRef1.current, 'conv_preds')
-                    classifier.addExample(activation, 0)
-                    classifier.addExample(activation, 0)
-                    classifier.addExample(activation, 0)
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
                 }
                 break;
             case "select2":
