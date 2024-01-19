@@ -1,8 +1,8 @@
 export const drawExample = (videoElement: any, poses: any, exampleCtx: any) => {
-    const croppXMin = videoElement.videoWidth * poses.box.xMin
-    const croppYMin = videoElement.videoHeight * poses.box.yMin
-    const croppWidth = videoElement.videoWidth * poses.box.width
-    const croppHeight = videoElement.videoHeight * poses.box.height
+    const croppXMin = videoElement.videoWidth * poses?.box.xMin
+    const croppYMin = videoElement.videoHeight * poses?.box.yMin
+    const croppWidth = videoElement.videoWidth * poses?.box.width
+    const croppHeight = videoElement.videoHeight * poses?.box.height
     // console.log(croppWidth, croppHeight)
-    exampleCtx.drawImage(videoElement, croppXMin, croppYMin, croppWidth, croppHeight, 0, 0, 300, 150)
+    poses && exampleCtx.drawImage(videoElement, croppXMin, croppYMin, croppWidth, croppHeight, 0, 0, 300, 150)
 }

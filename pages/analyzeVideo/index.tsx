@@ -78,29 +78,38 @@ export default function analyzeVideo() {
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
                 const croppedImageData = await croppedImage(videoElement, poses)
-                if (poses.length > 0 && mobileNetModel && blazePoseModel) {
+                console.log(croppedImageData)
+                croppedImageData.forEach((tensor: any) => tensor.dispose());
+                console.log(croppedImageData)
 
-                    canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
-                    drawSkeleton(ctx, videoElement, poses[0])
-                    drawSkeleton(ctx, videoElement, poses[1])
+                // if (poses.length > 0 && mobileNetModel && blazePoseModel) {
 
-                    switch (hitJudgment) {
-                        case true:
-                            croppedImageData.forEach((croppedImage: any) => {
-                                knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, "opponent").then((result) => {
-                                    result && console.log(result)
-                                })
-                            });
-                            break;
-                        case false:
-                            croppedImageData.forEach((croppedImage: any) => {
-                                knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, "myself").then((result) => {
-                                    console.log(result)
-                                })
-                            });
-                            break;
-                    }
-                }
+                //     canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                //     drawSkeleton(ctx, videoElement, poses[0])
+                //     drawSkeleton(ctx, videoElement, poses[1])
+
+                //     const predictKeypoint = (personName: string) => {
+                //         croppedImageData.forEach((croppedImage: any) => {
+                //             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
+                //                 result && result.length > 0 && console.log(result)
+                //             })
+                //         });
+                //     }
+                //     switch (hitJudgment) {
+                //         case true:
+                //             predictKeypoint("opponent")
+                //             break;
+                //         case false:
+                //             predictKeypoint("myself")
+                //             break;
+                //     }
+                //     if (lstmModel && xPredict) {
+                //         const prediction: any = lstmModel.predict(xPredict);
+                //         prediction.array().then((array: any) => {
+                //             // console.log(array); // この配列には、予測された値が含まれます。
+                //         });
+                //     }
+                // }
 
                 videoElement?.paused || requestAnimationFrame(animate);
             }
@@ -116,11 +125,27 @@ export default function analyzeVideo() {
         switch (myself) {
             case "select1":
                 console.log("select1")
+                if (mobileNetModel) {
+                    const activation = (mobileNetModel as any).infer(canvasRef1.current, 'conv_preds')
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                }
                 break;
             case "select2":
                 console.log("select2")
                 if (mobileNetModel) {
                     const activation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds')
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
                     classifier.addExample(activation, "myself")
                     classifier.addExample(activation, "myself")
                     classifier.addExample(activation, "myself")
@@ -141,10 +166,24 @@ export default function analyzeVideo() {
                     classifier.addExample(activation, "opponent")
                     classifier.addExample(activation, "opponent")
                     classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
                 }
                 break;
             case "select2":
                 console.log("select2")
+                if (mobileNetModel) {
+                    const activation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds')
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                }
                 break;
             // case "select3":
             //     console.log("select3")
@@ -158,13 +197,14 @@ export default function analyzeVideo() {
         // if (canvasRef.current) {
         //     canvasRef.current.style.pointerEvents = 'auto';
         // }
-    }, [myself, opponent])
+    }, [myself || opponent])
 
 
     const handleModelLoad = () => {
         const modelLoad = async () => {
             console.log("モデルロード開始")
             await tf.ready()
+
             const moveNetModel = await moveNetModelLoad()
             setMoveNetModel(moveNetModel)
             const mobileNetModel = await mobilenet.load()
@@ -172,17 +212,14 @@ export default function analyzeVideo() {
             const blazePoseModel = await blazePoseModelLoad()
             setBlazePoseModel(blazePoseModel)
 
-
             const xTrain = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]], [numSamples, inputSize, featureSize]);
             const yTrain = tf.tensor2d([[1, 0, 0], [0, 1, 0], [0, 0, 1]], [numSamples, outputSize]);
             const predict = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]], [numSamples, inputSize, featureSize]);
-
-            const testPredict = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]], [numSamples, inputSize, featureSize]);
+            const testPredict = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1]], [[0, 0, 0, 0, 0, 0, 0, 0, 0]], [[2, 2, 2, 2, 2, 2, 2, 2, 2]]], [numSamples, inputSize, 9]);
 
             setXTrain(xTrain)
             setYTrain(yTrain)
             setXPredict(predict)
-
             setXTestPredict(testPredict)
 
             console.log("モデルロード終了")
@@ -277,6 +314,10 @@ export default function analyzeVideo() {
         }
     }
 
+    const handleMemory = () => {
+        console.log(tf.memory())
+    }
+
 
     return (
         <>
@@ -308,6 +349,7 @@ export default function analyzeVideo() {
             <button onClick={handleTrain}>LSTMモデル学習ボタン</button>
             <button onClick={handlePredict}>LSTM推定ボタン</button>
             <button onClick={handleTestPredict}>lstm0の追定ボタン</button>
+            <button onClick={handleMemory}>メモリを調べる</button>
         </>
     )
 }
