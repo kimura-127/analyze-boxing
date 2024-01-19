@@ -9,9 +9,11 @@ export const knnClassifierPredict = async (mobileNetModel: mobilenet.MobileNet, 
 
     const activation = (mobileNetModel as any).infer(croppedImage, 'conv_preds')
     const result: any = await classifier.predictClass(activation)
-    if (result.label == personName && blazePoseModel) {
+    if (result.label === personName && blazePoseModel) {
         const squeezedImage = tf.squeeze(croppedImage as any, [0])
-        const result = await blazePoseModel.estimatePoses(squeezedImage as any)
-        return result
+        const keyPoint = await blazePoseModel.estimatePoses(squeezedImage as any)
+        return keyPoint
+    } else {
+        return null
     }
 }

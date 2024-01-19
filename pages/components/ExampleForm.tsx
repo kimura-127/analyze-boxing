@@ -14,6 +14,7 @@ const ExampleForm = () => {
 
 
     const addExample = (data: any) => {
+        console.log(data)
         Object.entries(data).map(([key, value]) => {
             if (value === "myself") {
                 setMyself(key)
