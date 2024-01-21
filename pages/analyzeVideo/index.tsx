@@ -76,42 +76,41 @@ export default function analyzeVideo() {
             setHnadlePlayBoolean(true)
         } else if (moveNetModel && videoElement) {
             const animate = async () => {
+
                 const poses = await moveNetModel.estimatePoses(videoElement);
                 const croppedImageData = await croppedImage(videoElement, poses)
-                console.log(croppedImageData)
-                croppedImageData.forEach((tensor: any) => tensor.dispose());
-                console.log(croppedImageData)
 
-                // if (poses.length > 0 && mobileNetModel && blazePoseModel) {
 
-                //     canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
-                //     drawSkeleton(ctx, videoElement, poses[0])
-                //     drawSkeleton(ctx, videoElement, poses[1])
+                if (poses.length > 0 && mobileNetModel && blazePoseModel) {
 
-                //     const predictKeypoint = (personName: string) => {
-                //         croppedImageData.forEach((croppedImage: any) => {
-                //             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
-                //                 result && result.length > 0 && console.log(result)
-                //             })
-                //         });
-                //     }
-                //     switch (hitJudgment) {
-                //         case true:
-                //             predictKeypoint("opponent")
-                //             break;
-                //         case false:
-                //             predictKeypoint("myself")
-                //             break;
-                //     }
-                //     if (lstmModel && xPredict) {
-                //         const prediction: any = lstmModel.predict(xPredict);
-                //         prediction.array().then((array: any) => {
-                //             // console.log(array); // この配列には、予測された値が含まれます。
-                //         });
-                //     }
-                // }
+                    canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                    drawSkeleton(ctx, videoElement, poses[0])
+                    drawSkeleton(ctx, videoElement, poses[1])
 
-                videoElement?.paused || requestAnimationFrame(animate);
+                    const predictKeypoint = (personName: string) => {
+                        croppedImageData.forEach((croppedImage: any) => {
+                            knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
+                                result && result.length > 0 && console.log(result)
+                            })
+                        });
+                    }
+                    switch (hitJudgment) {
+                        case true:
+                            const result = predictKeypoint("opponent")
+                            break;
+                        case false:
+                            predictKeypoint("myself")
+                            break;
+                    }
+                    // if (lstmModel && xPredict) {
+                    //     const prediction: any = lstmModel.predict(xPredict);
+                    //     prediction.array().then((array: any) => {
+                    //         // console.log(array); // この配列には、予測された値が含まれます。
+                    //     });
+                    // }
+                }
+
+                videoElement?.paused || requestAnimationFrame(animate)
             }
             requestAnimationFrame(animate)
         }
