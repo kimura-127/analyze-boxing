@@ -10,7 +10,7 @@ export const croppedImage = async (videoElement: any, analyze: any) => {
         const expandedVideoTensor: tf.Tensor4D = tf.expandDims(videoTensor, 0);
 
         // 切り抜かれた画像のサイズを指定
-        const cropSize: [number, number] = [100, 100]; // 例: 100x100にリサイズ
+        const cropSize: [number, number] = [100, 240]; // 例: 100x100にリサイズ
 
         // 切り抜く領域が1番目の画像に関連していることを示す
         const boxInd = tf.tensor1d([0], 'int32');

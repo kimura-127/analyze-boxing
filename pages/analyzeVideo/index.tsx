@@ -90,24 +90,27 @@ export default function analyzeVideo() {
                     const predictKeypoint = (personName: string) => {
                         croppedImageData.forEach((croppedImage: any) => {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
-                                result && result.length > 0 && console.log(result)
+                                result && result.length > 0 && boxerKeypoint.push(result)
+                                if (boxerKeypoint.length > 50) {
+                                    boxerKeypoint.shift()
+                                }
                             })
                         });
                     }
                     switch (hitJudgment) {
                         case true:
-                            const result = predictKeypoint("opponent")
+                            predictKeypoint("opponent")
                             break;
                         case false:
                             predictKeypoint("myself")
                             break;
                     }
-                    // if (lstmModel && xPredict) {
-                    //     const prediction: any = lstmModel.predict(xPredict);
-                    //     prediction.array().then((array: any) => {
-                    //         // console.log(array); // この配列には、予測された値が含まれます。
-                    //     });
-                    // }
+                    if (lstmModel && xPredict) {
+                        const prediction: any = lstmModel.predict(xPredict);
+                        prediction.array().then((array: any) => {
+                            // console.log(array); // この配列には、予測された値が含まれます。
+                        });
+                    }
                 }
 
                 videoElement?.paused || requestAnimationFrame(animate)
@@ -211,10 +214,10 @@ export default function analyzeVideo() {
             const blazePoseModel = await blazePoseModelLoad()
             setBlazePoseModel(blazePoseModel)
 
-            const xTrain = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]], [numSamples, inputSize, featureSize]);
-            const yTrain = tf.tensor2d([[1, 0, 0], [0, 1, 0], [0, 0, 1]], [numSamples, outputSize]);
-            const predict = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]], [numSamples, inputSize, featureSize]);
-            const testPredict = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1]], [[0, 0, 0, 0, 0, 0, 0, 0, 0]], [[2, 2, 2, 2, 2, 2, 2, 2, 2]]], [numSamples, inputSize, 9]);
+            const xTrain = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
+            const yTrain = tf.tensor2d([[1, 0], [0, 1]], [numSamples, outputSize]);
+            const predict = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
+            const testPredict = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
 
             setXTrain(xTrain)
             setYTrain(yTrain)
@@ -236,11 +239,11 @@ export default function analyzeVideo() {
         }
     }
 
-    const inputSize = 1; // シーケンス長 []の数
+    const inputSize = 2; // シーケンス長 []の数
     const featureSize = 10; // サンプル内の特徴量の数
-    const outputSize = 3; // 出力の次元数,numSamplesと同じ値にすること
+    const outputSize = 2; // 出力の次元数,numSamplesと同じ値にすること
     const lstmUnits = 50;   // LSTMユニットの数
-    const numSamples = 3; // サンプル数,データの総数のこと
+    const numSamples = 2; // サンプル数,データの総数のこと
 
 
 
@@ -314,7 +317,17 @@ export default function analyzeVideo() {
     }
 
     const handleMemory = () => {
-        console.log(tf.memory())
+        // console.log(tf.memory())
+        console.log(boxerKeypoint)
+    }
+
+
+    const handleJabSet = () => {
+
+    }
+
+    const handleSet = () => {
+
     }
 
 
@@ -349,6 +362,9 @@ export default function analyzeVideo() {
             <button onClick={handlePredict}>LSTM推定ボタン</button>
             <button onClick={handleTestPredict}>lstm0の追定ボタン</button>
             <button onClick={handleMemory}>メモリを調べる</button>
+            <button onClick={handleJabSet}>通常時に設定</button>
+            <button onClick={handleSet}>ジャブに設定</button>
+            <button>学習</button>
         </>
     )
 }
