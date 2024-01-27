@@ -48,6 +48,8 @@ export default function analyzeVideo() {
     const [xPredict, setXPredict] = useState<tf.Tensor3D>()
     const [yTrain, setYTrain] = useState<tf.Tensor2D>()
     const [xTestPredict, setXTestPredict] = useState<tf.Tensor3D>()
+    const [xJabTrain, setXJabTrain] = useState()
+    const [xNoneJabTrain, setXNoneJabTrain] = useState()
     const boxerKeypoint: any = []
 
 
@@ -90,8 +92,10 @@ export default function analyzeVideo() {
                     const predictKeypoint = (personName: string) => {
                         croppedImageData.forEach((croppedImage: any) => {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
-                                result && result.length > 0 && boxerKeypoint.push(result)
-                                if (boxerKeypoint.length > 50) {
+                                result && result.length > 0 && boxerKeypoint.push(result[0].keypoints)
+                                // result && result.length > 0 && result[0].keypoints.map((index: any) => { boxerKeypoint.push(index.x, index.y, index.z, index.score) })
+                                // result && result.length > 0 && console.log(result[0])
+                                while (boxerKeypoint.length > 3300) {
                                     boxerKeypoint.shift()
                                 }
                             })
@@ -218,7 +222,7 @@ export default function analyzeVideo() {
             const yTrain = tf.tensor2d([[1, 0], [0, 1]], [numSamples, outputSize]);
             const predict = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
             const testPredict = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
-
+            console.log([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]])
             setXTrain(xTrain)
             setYTrain(yTrain)
             setXPredict(predict)
@@ -321,12 +325,14 @@ export default function analyzeVideo() {
         console.log(boxerKeypoint)
     }
 
-
-    const handleJabSet = () => {
+    const handleSet = () => {
+        const xTrain = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
 
     }
 
-    const handleSet = () => {
+
+    const handleJabSet = () => {
+        const xTrain = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
 
     }
 
@@ -362,8 +368,8 @@ export default function analyzeVideo() {
             <button onClick={handlePredict}>LSTM推定ボタン</button>
             <button onClick={handleTestPredict}>lstm0の追定ボタン</button>
             <button onClick={handleMemory}>メモリを調べる</button>
-            <button onClick={handleJabSet}>通常時に設定</button>
-            <button onClick={handleSet}>ジャブに設定</button>
+            <button onClick={handleSet}>通常時に設定</button>
+            <button onClick={handleJabSet}>ジャブに設定</button>
             <button>学習</button>
         </>
     )
