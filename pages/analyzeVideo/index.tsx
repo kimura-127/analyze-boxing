@@ -92,10 +92,9 @@ export default function analyzeVideo() {
                     const predictKeypoint = (personName: string) => {
                         croppedImageData.forEach((croppedImage: any) => {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
-                                result && result.length > 0 && boxerKeypoint.push(result[0].keypoints)
-                                // result && result.length > 0 && result[0].keypoints.map((index: any) => { boxerKeypoint.push(index.x, index.y, index.z, index.score) })
-                                // result && result.length > 0 && console.log(result[0])
-                                while (boxerKeypoint.length > 3300) {
+                                const arrayTest: any[] = []
+                                result && result.length > 0 && result[0].keypoints.map((kp: any) => { arrayTest.push(kp.x, kp.y, kp.z, kp.score) }) && boxerKeypoint.push(arrayTest)
+                                while (boxerKeypoint.length > 50) {
                                     boxerKeypoint.shift()
                                 }
                             })
