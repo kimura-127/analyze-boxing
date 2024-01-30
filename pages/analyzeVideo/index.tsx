@@ -48,9 +48,10 @@ export default function analyzeVideo() {
     const [xPredict, setXPredict] = useState<tf.Tensor3D>()
     const [yTrain, setYTrain] = useState<tf.Tensor2D>()
     const [xTestPredict, setXTestPredict] = useState<tf.Tensor3D>()
-    const [xJabTrain, setXJabTrain] = useState()
-    const [xNoneJabTrain, setXNoneJabTrain] = useState()
     const boxerKeypoint: any = []
+    const jabRef = useRef([]);
+    const noneJabRef = useRef([]);
+
 
 
 
@@ -325,14 +326,19 @@ export default function analyzeVideo() {
     }
 
     const handleSet = () => {
-        const xTrain = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
-
+        // const xTrain = tf.tensor3d([boxerKeypoint], [1, 50, 132]);
+        noneJabRef.current = boxerKeypoint
+        console.log(noneJabRef)
     }
 
 
     const handleJabSet = () => {
-        const xTrain = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
+        jabRef.current = boxerKeypoint
+        console.log(jabRef)
+    }
 
+    const handleLearn = () => {
+        console.log(noneJabRef, jabRef)
     }
 
 
@@ -369,7 +375,7 @@ export default function analyzeVideo() {
             <button onClick={handleMemory}>メモリを調べる</button>
             <button onClick={handleSet}>通常時に設定</button>
             <button onClick={handleJabSet}>ジャブに設定</button>
-            <button>学習</button>
+            <button onClick={handleLearn}>学習</button>
         </>
     )
 }
