@@ -14,10 +14,10 @@ export const drawSkeleton = async (ctx: CanvasRenderingContext2D | null, videoEl
         // const rightWrist = [analyze.keypoints[10].x / videoElement.videoWidth * 700, analyze.keypoints[10].y / videoElement.videoHeight * 400]
         // const leftHip = [analyze.keypoints[11].x / videoElement.videoWidth * 700, analyze.keypoints[11].y / videoElement.videoHeight * 400]
         // const rightHip = [analyze.keypoints[12].x / videoElement.videoWidth * 700, analyze.keypoints[12].y / videoElement.videoHeight * 400]
-        const leftTop = [analyze.box?.xMin * 700, analyze.box?.yMin * 400]
-        const rightTop = [analyze.box?.xMax * 700, analyze.box?.yMin * 400]
-        const leftUnder = [analyze.box?.xMin * 700, analyze.box?.yMax * 400]
-        const rightUnder = [analyze.box?.xMax * 700, analyze.box?.yMax * 400]
+        const leftTop = [analyze.box?.xMin * 665, analyze.box?.yMin * 400]
+        const rightTop = [analyze.box?.xMax * 735, analyze.box?.yMin * 400]
+        const leftUnder = [analyze.box?.xMin * 665, analyze.box?.yMax * 400]
+        const rightUnder = [analyze.box?.xMax * 735, analyze.box?.yMax * 400]
         ctx.beginPath();
         ctx.textAlign = "center"
         // ctx.strokeText(analyze.id, nose[0], nose[1] - 25);

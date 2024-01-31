@@ -49,8 +49,8 @@ export default function analyzeVideo() {
     const [yTrain, setYTrain] = useState<tf.Tensor2D>()
     const [xTestPredict, setXTestPredict] = useState<tf.Tensor3D>()
     const boxerKeypoint: any = []
-    const jabRef = useRef([]);
-    const noneJabRef = useRef([]);
+    const jabKeypoint: any = []
+    const noneJabKeypoint: any = []
 
 
 
@@ -93,8 +93,8 @@ export default function analyzeVideo() {
                     const predictKeypoint = (personName: string) => {
                         croppedImageData.forEach((croppedImage: any) => {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
-                                const arrayTest: any[] = []
-                                result && result.length > 0 && result[0].keypoints.map((kp: any) => { arrayTest.push(kp.x, kp.y, kp.z, kp.score) }) && boxerKeypoint.push(arrayTest)
+                                const array: any[] = []
+                                result && result.length > 0 && result[0].keypoints.map((kp: any) => { array.push(kp.x, kp.y, kp.z, kp.score) }) && boxerKeypoint.push(array) && console.log(result)
                                 while (boxerKeypoint.length > 50) {
                                     boxerKeypoint.shift()
                                 }
@@ -326,19 +326,18 @@ export default function analyzeVideo() {
     }
 
     const handleSet = () => {
-        // const xTrain = tf.tensor3d([boxerKeypoint], [1, 50, 132]);
-        noneJabRef.current = boxerKeypoint
-        console.log(noneJabRef)
+        boxerKeypoint.map((kp: any) => { noneJabKeypoint.push(kp) })
+        console.log(noneJabKeypoint)
     }
 
 
     const handleJabSet = () => {
-        jabRef.current = boxerKeypoint
-        console.log(jabRef)
+        boxerKeypoint.map((kp: any) => { jabKeypoint.push(kp) })
+        console.log(jabKeypoint)
     }
 
     const handleLearn = () => {
-        console.log(noneJabRef, jabRef)
+        console.log(videoRef.current?.videoHeight)
     }
 
 
