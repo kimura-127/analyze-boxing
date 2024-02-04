@@ -96,7 +96,8 @@ export default function analyzeVideo() {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
                                 const array: any[] = []
                                 result && result.length > 0 && result[0].keypoints.map((kp: any) => { array.push(kp.x, kp.y, kp.z, kp.score) }) && boxerKeypoint.push(array)
-                                while (boxerKeypoint.length > 50) {
+                                // && console.log("FPS")
+                                while (boxerKeypoint.length > inputSize) {
                                     boxerKeypoint.shift()
                                 }
                             })
@@ -110,13 +111,13 @@ export default function analyzeVideo() {
                             predictKeypoint("myself")
                             break;
                     }
-                    if (handleAnalyze.current && lstmModel && boxerKeypoint.length == 50) {
+                    if (handleAnalyze.current && lstmModel && boxerKeypoint.length == inputSize) {
                         const xTrain = tf.tensor3d([boxerKeypoint, boxerKeypoint], [numSamples, inputSize, featureSize]);
                         const prediction: any = lstmModel.predict(xTrain);
                         prediction.array().then((array: any) => {
-                            console.log(array); // この配列には、予測された値が含まれます。
+                            console.log(array[0][0].toFixed(1), array[0][1].toFixed(1)); // この配列には、予測された値が含まれます。
                         });
-                    } else { console.log("なし") }
+                    }
                 }
 
                 videoElement?.paused || requestAnimationFrame(animate)
@@ -244,7 +245,7 @@ export default function analyzeVideo() {
         }
     }
 
-    const inputSize = 50; // シーケンス長 []の数
+    const inputSize = 15; // シーケンス長 []の数
     const featureSize = 132; // サンプル内の特徴量の数
     const outputSize = 2; // 出力の次元数,numSamplesと同じ値にすること
     const lstmUnits = 50;   // LSTMユニットの数
