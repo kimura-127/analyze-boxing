@@ -327,19 +327,21 @@ export default function analyzeVideo() {
     }
 
     const handleSet = () => {
+        noneJabKeypoint.length = 0
         boxerKeypoint.map((kp: any) => { noneJabKeypoint.push(kp) })
         console.log(noneJabKeypoint)
     }
 
 
     const handleJabSet = () => {
+        jabKeypoint.length = 0
         boxerKeypoint.map((kp: any) => { jabKeypoint.push(kp) })
         console.log(jabKeypoint)
     }
 
     const handleLearn = () => {
         if (lstmModel && yTrain) {
-            const xTrain = tf.tensor3d([[noneJabKeypoint], [jabKeypoint]], [numSamples, inputSize, featureSize]);
+            const xTrain = tf.tensor3d([noneJabKeypoint, jabKeypoint], [numSamples, inputSize, featureSize]);
             console.log("学習開始")
             lstmModel.fit(xTrain, yTrain, { epochs: 20, batchSize: 50 }); // batchSizeを1に変更
             console.log("学習終了")
