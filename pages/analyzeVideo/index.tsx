@@ -51,6 +51,7 @@ export default function analyzeVideo() {
     const boxerKeypoint: any = []
     const jabKeypoint: any = []
     const noneJabKeypoint: any = []
+    const handleAnalyze = useRef(false)
 
 
 
@@ -94,7 +95,7 @@ export default function analyzeVideo() {
                         croppedImageData.forEach((croppedImage: any) => {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
                                 const array: any[] = []
-                                result && result.length > 0 && result[0].keypoints.map((kp: any) => { array.push(kp.x, kp.y, kp.z, kp.score) }) && boxerKeypoint.push(array) && console.log(result)
+                                result && result.length > 0 && result[0].keypoints.map((kp: any) => { array.push(kp.x, kp.y, kp.z, kp.score) }) && boxerKeypoint.push(array)
                                 while (boxerKeypoint.length > 50) {
                                     boxerKeypoint.shift()
                                 }
@@ -109,12 +110,13 @@ export default function analyzeVideo() {
                             predictKeypoint("myself")
                             break;
                     }
-                    if (lstmModel && xPredict) {
-                        const prediction: any = lstmModel.predict(xPredict);
+                    if (handleAnalyze.current && lstmModel && boxerKeypoint.length == 50) {
+                        const xTrain = tf.tensor3d([boxerKeypoint, boxerKeypoint], [numSamples, inputSize, featureSize]);
+                        const prediction: any = lstmModel.predict(xTrain);
                         prediction.array().then((array: any) => {
-                            // console.log(array); // この配列には、予測された値が含まれます。
+                            console.log(array); // この配列には、予測された値が含まれます。
                         });
-                    }
+                    } else { console.log("なし") }
                 }
 
                 videoElement?.paused || requestAnimationFrame(animate)
@@ -218,15 +220,14 @@ export default function analyzeVideo() {
             const blazePoseModel = await blazePoseModelLoad()
             setBlazePoseModel(blazePoseModel)
 
-            const xTrain = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
             const yTrain = tf.tensor2d([[1, 0], [0, 1]], [numSamples, outputSize]);
-            const predict = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
-            const testPredict = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
-            console.log([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]])
-            setXTrain(xTrain)
+            // const predict = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
+            // const testPredict = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
+            // console.log([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]])
+            // setXTrain(xTrain)
             setYTrain(yTrain)
-            setXPredict(predict)
-            setXTestPredict(testPredict)
+            // setXPredict(predict)
+            // setXTestPredict(testPredict)
 
             console.log("モデルロード終了")
         }
@@ -243,8 +244,8 @@ export default function analyzeVideo() {
         }
     }
 
-    const inputSize = 2; // シーケンス長 []の数
-    const featureSize = 10; // サンプル内の特徴量の数
+    const inputSize = 50; // シーケンス長 []の数
+    const featureSize = 132; // サンプル内の特徴量の数
     const outputSize = 2; // 出力の次元数,numSamplesと同じ値にすること
     const lstmUnits = 50;   // LSTMユニットの数
     const numSamples = 2; // サンプル数,データの総数のこと
@@ -296,7 +297,7 @@ export default function analyzeVideo() {
     const handleTrain = () => {
         if (lstmModel && xTrain && yTrain) {
             console.log("学習開始")
-            lstmModel.fit(xTrain, yTrain, { epochs: 20, batchSize: 1 }); // batchSizeを1に変更
+            lstmModel.fit(xTrain, yTrain, { epochs: 20, batchSize: 50 }); // batchSizeを1に変更
             console.log("学習終了")
         }
     }
@@ -337,9 +338,25 @@ export default function analyzeVideo() {
     }
 
     const handleLearn = () => {
-        console.log(videoRef.current?.videoHeight)
+        if (lstmModel && yTrain) {
+            const xTrain = tf.tensor3d([[noneJabKeypoint], [jabKeypoint]], [numSamples, inputSize, featureSize]);
+            console.log("学習開始")
+            lstmModel.fit(xTrain, yTrain, { epochs: 20, batchSize: 50 }); // batchSizeを1に変更
+            console.log("学習終了")
+        } else {
+            console.log("学習")
+        }
     }
 
+    const handleAddAnalyze = () => {
+        if (handleAnalyze.current) {
+            handleAnalyze.current = false
+            console.log(handleAnalyze)
+        } else {
+            handleAnalyze.current = true
+            console.log(handleAnalyze)
+        }
+    }
 
     return (
         <>
@@ -368,13 +385,14 @@ export default function analyzeVideo() {
             <Form />
             <button onClick={handleModelLoad}>分析モデルをロードする</button>
             <button onClick={handleLstmLoad}>LSTMモデルロードボタン</button>
-            <button onClick={handleTrain}>LSTMモデル学習ボタン</button>
-            <button onClick={handlePredict}>LSTM推定ボタン</button>
-            <button onClick={handleTestPredict}>lstm0の追定ボタン</button>
+            {/* <button onClick={handleTrain}>LSTMモデル学習ボタン</button> */}
+            {/* <button onClick={handlePredict}>LSTM推定ボタン</button> */}
+            {/* <button onClick={handleTestPredict}>lstm0の追定ボタン</button> */}
             <button onClick={handleMemory}>メモリを調べる</button>
             <button onClick={handleSet}>通常時に設定</button>
             <button onClick={handleJabSet}>ジャブに設定</button>
             <button onClick={handleLearn}>学習</button>
+            <button onClick={handleAddAnalyze}>分析処理追加</button>
         </>
     )
 }
