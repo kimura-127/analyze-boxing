@@ -82,7 +82,7 @@ export default function analyzeVideo() {
             const animate = async () => {
 
                 const poses = await moveNetModel.estimatePoses(videoElement);
-                const croppedImageData = await croppedImage(videoElement, poses)
+                const croppedImageData = await croppedImage(videoElement, poses, 100)
 
 
                 if (poses.length > 0 && mobileNetModel && blazePoseModel) {
@@ -96,7 +96,7 @@ export default function analyzeVideo() {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
                                 const array: any[] = []
                                 result && result.length > 0 && result[0].keypoints.map((kp: any) => { array.push(kp.x, kp.y, kp.z, kp.score) }) && boxerKeypoint.push(array)
-                                // && console.log("FPS")
+                                    && console.log("FPS")
                                 while (boxerKeypoint.length > inputSize) {
                                     boxerKeypoint.shift()
                                 }
