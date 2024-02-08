@@ -52,6 +52,7 @@ export default function analyzeVideo() {
     const jabKeypoint: any = []
     const noneJabKeypoint: any = []
     const handleAnalyze = useRef(false)
+    const yPixelSize = useRef(100)
 
 
 
@@ -82,7 +83,7 @@ export default function analyzeVideo() {
             const animate = async () => {
 
                 const poses = await moveNetModel.estimatePoses(videoElement);
-                const croppedImageData = await croppedImage(videoElement, poses, 100)
+                const croppedImageData = await croppedImage(videoElement, poses, yPixelSize.current)
 
 
                 if (poses.length > 0 && mobileNetModel && blazePoseModel) {
@@ -96,7 +97,7 @@ export default function analyzeVideo() {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
                                 const array: any[] = []
                                 result && result.length > 0 && result[0].keypoints.map((kp: any) => { array.push(kp.x, kp.y, kp.z, kp.score) }) && boxerKeypoint.push(array)
-                                    && console.log("FPS")
+                                // && console.log("FPS")
                                 while (boxerKeypoint.length > inputSize) {
                                     boxerKeypoint.shift()
                                 }
@@ -115,7 +116,7 @@ export default function analyzeVideo() {
                         const xTrain = tf.tensor3d([boxerKeypoint, boxerKeypoint], [numSamples, inputSize, featureSize]);
                         const prediction: any = lstmModel.predict(xTrain);
                         prediction.array().then((array: any) => {
-                            console.log(array[0][0].toFixed(1), array[0][1].toFixed(1)); // この配列には、予測された値が含まれます。
+                            // console.log(array[0][0].toFixed(1), array[0][1].toFixed(1)); // この配列には、予測された値が含まれます。
                         });
                     }
                 }
@@ -361,6 +362,12 @@ export default function analyzeVideo() {
         }
     }
 
+    const handlePixel = () => {
+        yPixelSize.current += 100
+        console.log(yPixelSize.current)
+    }
+
+
     return (
         <>
             <video
@@ -396,6 +403,7 @@ export default function analyzeVideo() {
             <button onClick={handleJabSet}>ジャブに設定</button>
             <button onClick={handleLearn}>学習</button>
             <button onClick={handleAddAnalyze}>分析処理追加</button>
+            <button onClick={handlePixel}>ビクセル100プラス</button>
         </>
     )
 }
