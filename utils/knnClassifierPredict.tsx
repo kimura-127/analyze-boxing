@@ -3,7 +3,7 @@ import * as mobilenet from '@tensorflow-models/mobilenet';
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
 import * as tf from '@tensorflow/tfjs';
 import * as poseDetection from '@tensorflow-models/pose-detection';
-import { drawExample } from './drawExample';
+
 
 
 export const knnClassifierPredict = async (mobileNetModel: mobilenet.MobileNet, croppedImage: Tensor4D, classifier: knnClassifier.KNNClassifier, blazePoseModel: poseDetection.PoseDetector, personName: string) => {
