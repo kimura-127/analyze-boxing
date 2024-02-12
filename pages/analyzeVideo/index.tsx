@@ -98,6 +98,7 @@ export default function analyzeVideo() {
                                 const array: any[] = []
                                 result && result.length > 0 && result[0].keypoints.map((kp: any) => { array.push(kp.x, kp.y, kp.z, kp.score) }) && boxerKeypoint.push(array)
                                 // && console.log("FPS")
+                                // && console.log(result)
                                 while (boxerKeypoint.length > inputSize) {
                                     boxerKeypoint.shift()
                                 }
@@ -116,7 +117,7 @@ export default function analyzeVideo() {
                         const xTrain = tf.tensor3d([boxerKeypoint, boxerKeypoint], [numSamples, inputSize, featureSize]);
                         const prediction: any = lstmModel.predict(xTrain);
                         prediction.array().then((array: any) => {
-                            // console.log(array[0][0].toFixed(1), array[0][1].toFixed(1)); // この配列には、予測された値が含まれます。
+                            console.log(array[0][0].toFixed(1), array[0][1].toFixed(1)); // この配列には、予測された値が含まれます。
                         });
                     }
                 }
@@ -231,7 +232,7 @@ export default function analyzeVideo() {
             // setXPredict(predict)
             // setXTestPredict(testPredict)
 
-            console.log("モデルロード終了")
+            console.log("モデルロード完全終了")
         }
         const videoElement = videoRef.current
         const canvasElement = canvasRef.current
@@ -367,6 +368,16 @@ export default function analyzeVideo() {
         console.log(yPixelSize.current)
     }
 
+    const handleSaveModel = () => {
+        const saveModel = async () => {
+            if (lstmModel) {
+                await lstmModel.save('downloads://lstm-model');
+            }
+        }
+
+        saveModel()
+    }
+
 
     return (
         <>
@@ -404,6 +415,7 @@ export default function analyzeVideo() {
             <button onClick={handleLearn}>学習</button>
             <button onClick={handleAddAnalyze}>分析処理追加</button>
             <button onClick={handlePixel}>ビクセル100プラス</button>
+            <button onClick={handleSaveModel}>モデルセーブ</button>
         </>
     )
 }
