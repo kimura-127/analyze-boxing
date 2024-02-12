@@ -279,13 +279,27 @@ export default function analyzeVideo() {
     const handleLstmLoad = () => {
         console.log("モデルロード開始開始")
 
-        // const lstmModel = createLSTMModel(inputSize, featureSize, outputSize, lstmUnits);
+
         const modelUrl = '/models/myLSTMModels/v1/lstm-model.json';
         const lstmModel = async () => {
             const model = await tf.loadLayersModel(modelUrl);
+            const learningRate = 0.001;
+            const optimizer = tf.train.adam(learningRate);
+            model.compile({
+                optimizer: optimizer,
+                loss:
+                    'categoricalCrossentropy' //多クラス分類のための損失関数 ※ワンホットエンコーディング必須
+                // 'sparseCategoricalCrossentropy' //多クラス分類のための損失関数
+                // 'binaryCrossentropy' //二値分類のための損失関数
+                ,
+                metrics: ['accuracy']
+            });
             setLstmModel(model)
         }
         lstmModel()
+
+        // 独自のLSTMモデル用意する際のコード
+        // const lstmModel = createLSTMModel(inputSize, featureSize, outputSize, lstmUnits);
         // setLstmModel(lstmModel)
 
         // const learningRate = 0.001;
@@ -304,32 +318,6 @@ export default function analyzeVideo() {
         console.log("モデルロード終わり")
     }
 
-    const handleTrain = () => {
-        if (lstmModel && xTrain && yTrain) {
-            console.log("学習開始")
-            lstmModel.fit(xTrain, yTrain, { epochs: 20, batchSize: 50 }); // batchSizeを1に変更
-            console.log("学習終了")
-        }
-    }
-
-
-    const handlePredict = () => {
-        if (lstmModel && xPredict) {
-            const prediction: any = lstmModel.predict(xPredict);
-            prediction.array().then((array: any) => {
-                console.log(array); // この配列には、予測された値が含まれます。
-            });
-        }
-    }
-
-    const handleTestPredict = () => {
-        if (lstmModel && xTestPredict) {
-            const prediction: any = lstmModel.predict(xTestPredict);
-            prediction.array().then((array: any) => {
-                console.log(array); // この配列には、予測された値が含まれます。
-            });
-        }
-    }
 
     const handleMemory = () => {
         // console.log(tf.memory())
@@ -413,9 +401,6 @@ export default function analyzeVideo() {
             <Form />
             <button onClick={handleModelLoad}>分析モデルをロードする</button>
             <button onClick={handleLstmLoad}>LSTMモデルロードボタン</button>
-            {/* <button onClick={handleTrain}>LSTMモデル学習ボタン</button> */}
-            {/* <button onClick={handlePredict}>LSTM推定ボタン</button> */}
-            {/* <button onClick={handleTestPredict}>lstm0の追定ボタン</button> */}
             <button onClick={handleMemory}>メモリを調べる</button>
             <button onClick={handleSet}>通常時に設定</button>
             <button onClick={handleJabSet}>ジャブに設定</button>
