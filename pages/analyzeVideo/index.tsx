@@ -43,7 +43,8 @@ export default function analyzeVideo() {
     const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null)
     const [example1Ctx, setExample1Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
     const [example2Ctx, setExample2Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
-    const [lstmModel, setLstmModel] = useState<tf.Sequential>()
+    // const [lstmModel, setLstmModel] = useState<tf.Sequential>()
+    const [lstmModel, setLstmModel] = useState<any>()
     const [xTrain, setXTrain] = useState<tf.Tensor3D>()
     const [xPredict, setXPredict] = useState<tf.Tensor3D>()
     const [yTrain, setYTrain] = useState<tf.Tensor2D>()
@@ -278,20 +279,26 @@ export default function analyzeVideo() {
     const handleLstmLoad = () => {
         console.log("モデルロード開始開始")
 
-        const lstmModel = createLSTMModel(inputSize, featureSize, outputSize, lstmUnits);
-        setLstmModel(lstmModel)
+        // const lstmModel = createLSTMModel(inputSize, featureSize, outputSize, lstmUnits);
+        const modelUrl = '/models/myLSTMModels/v1/lstm-model.json';
+        const lstmModel = async () => {
+            const model = await tf.loadLayersModel(modelUrl);
+            setLstmModel(model)
+        }
+        lstmModel()
+        // setLstmModel(lstmModel)
 
-        const learningRate = 0.001;
-        const optimizer = tf.train.adam(learningRate);
-        lstmModel.compile({
-            optimizer: optimizer,
-            loss:
-                'categoricalCrossentropy' //多クラス分類のための損失関数 ※ワンホットエンコーディング必須
-            // 'sparseCategoricalCrossentropy' //多クラス分類のための損失関数
-            // 'binaryCrossentropy' //二値分類のための損失関数
-            ,
-            metrics: ['accuracy']
-        });
+        // const learningRate = 0.001;
+        // const optimizer = tf.train.adam(learningRate);
+        // lstmModel.compile({
+        //     optimizer: optimizer,
+        //     loss:
+        //         'categoricalCrossentropy' //多クラス分類のための損失関数 ※ワンホットエンコーディング必須
+        //     // 'sparseCategoricalCrossentropy' //多クラス分類のための損失関数
+        //     // 'binaryCrossentropy' //二値分類のための損失関数
+        //     ,
+        //     metrics: ['accuracy']
+        // });
 
 
         console.log("モデルロード終わり")
