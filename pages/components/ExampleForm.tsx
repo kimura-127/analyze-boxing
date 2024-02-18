@@ -4,24 +4,30 @@ import { useRecoilState } from "recoil";
 import { myselfState } from "@/atoms/myselfState";
 import { opponentState } from "@/atoms/opponentState";
 import { hitJudgmentState } from "@/atoms/hitJudgmentState";
+import { addExampleIndexState } from "@/atoms/addExampleIndexState";
 
 const ExampleForm = () => {
     const { register, handleSubmit } = useForm();
     const [myself, setMyself] = useRecoilState(myselfState)
     const [opponent, setOpponent] = useRecoilState(opponentState)
     const [hitJudgment, setHitJudgment] = useRecoilState(hitJudgmentState)
+    const [addExampleIndex, setAddExampleIndex] = useRecoilState(addExampleIndexState)
 
 
 
     const addExample = (data: any) => {
-        console.log(data)
+        setAddExampleIndex(addExampleIndex + 1)
         Object.entries(data).map(([key, value]) => {
-            if (value === "myself") {
-                setMyself(key)
-            } else if (value === "opponent") {
-                setOpponent(key)
-            } else if (value === "impactJudgment") {
-                setHitJudgment(false)
+            switch (value) {
+                case "myself":
+                    setMyself(key)
+                    break;
+                case "opponent":
+                    setOpponent(key)
+                    break;
+                case "impactJudgment":
+                    setHitJudgment(false)
+                    break;
             }
         });
     }
