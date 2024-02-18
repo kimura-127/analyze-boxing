@@ -19,7 +19,7 @@ import { knnClassifierPredict } from "@/utils/knnClassifierPredict";
 import { Tensor3D } from '@tensorflow/tfjs-core';
 import { Tensor4D } from '@tensorflow/tfjs-core';
 import { hitJudgmentState } from "@/atoms/hitJudgmentState";
-
+import { addExampleIndexState } from "@/atoms/addExampleIndexState";
 
 
 
@@ -32,9 +32,9 @@ export default function analyzeVideo() {
     const canvasRef2 = useRef<HTMLCanvasElement>(null);
     const canvasRef3 = useRef<HTMLCanvasElement>(null);
     const canvasRef4 = useRef<HTMLCanvasElement>(null);
-    const [handlePlayBoolean, setHnadlePlayBoolean] = useState(false)
     const [myself, setMyself] = useRecoilState(myselfState)
     const [opponent, setOpponent] = useRecoilState(opponentState)
+    const [addExampleIndex, setAddExampleIndex] = useRecoilState(addExampleIndexState)
     const [hitJudgment, setHitJudgment] = useRecoilState(hitJudgmentState)
     const [mobileNetModel, setMobileNetModel] = useState<mobilenet.MobileNet | null>(null)
     const [moveNetModel, setMoveNetModel] = useState<poseDetection.PoseDetector | null>(null)
@@ -54,6 +54,7 @@ export default function analyzeVideo() {
     const noneJabKeypoint: any = []
     const handleAnalyze = useRef(false)
     const yPixelSize = useRef(100)
+    const handlePlayIndex = useRef(0)
 
 
 
@@ -70,17 +71,21 @@ export default function analyzeVideo() {
         setExample2Ctx(example2Ctx)
 
 
-        if (!handlePlayBoolean && moveNetModel && videoElement) {
-            const showExample = async () => {
+        if (moveNetModel && videoElement && handlePlayIndex.current < 5) {
+
+            const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
-                console.log(poses)
-                drawExample(videoElement, poses[0], example1Ctx)
-                drawExample(videoElement, poses[1], example2Ctx)
+                if (poses.length > 1) {
+                    videoElement?.pause()
+                    handlePlayIndex.current++
+                    console.log(handlePlayIndex.current)
+                    videoElement.style.pointerEvents = 'none';
+                    drawExample(videoElement, poses[0], example1Ctx)
+                    drawExample(videoElement, poses[1], example2Ctx)
+                }
+                setTimeout(() => { videoElement?.paused || requestAnimationFrame(animate) }, 3000)
             }
-            showExample()
-            videoElement?.pause()
-            setHnadlePlayBoolean(true)
-            videoElement.style.pointerEvents = 'none';
+            setTimeout(() => { requestAnimationFrame(animate) }, 3000)
         } else if (moveNetModel && videoElement) {
             const animate = async () => {
 
@@ -99,7 +104,7 @@ export default function analyzeVideo() {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
                                 const array: any[] = []
                                 result && result.length > 0 && result[0].keypoints.map((kp: any) => { array.push(kp.x, kp.y, kp.z, kp.score) }) && boxerKeypoint.push(array)
-                                // && console.log("FPS")
+                                    && console.log("FPS")
                                 // && console.log(result)
                                 while (boxerKeypoint.length > inputSize) {
                                     boxerKeypoint.shift()
@@ -136,13 +141,11 @@ export default function analyzeVideo() {
     useEffect(() => {
         const flipCanvasHorizontally = (canvas: HTMLCanvasElement) => {
             const context = canvas.getContext('2d');
-
             // 描画コンテキストの設定を変更して左右反転
             context?.scale(-1, 1); // X軸方向に反転
             // 再描写
             context?.drawImage(canvas, -canvas.width, 0, canvas.width, canvas.height);
-
-            // 描画設定を元に戻す（このケースでは必要ないが、一般的なベストプラクティスとして実行）
+            // 描画設定を元に戻す
             context?.setTransform(1, 0, 0, 1, 0, 0);
         }
         switch (myself) {
@@ -156,10 +159,18 @@ export default function analyzeVideo() {
                     classifier.addExample(activation, "myself")
                     classifier.addExample(activation, "myself")
                     classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
 
                     flipCanvasHorizontally(canvasRef1.current);
 
                     const reverseActivation = (mobileNetModel as any).infer(canvasRef1.current, 'conv_preds');
+                    classifier.addExample(reverseActivation, "myself");
+                    classifier.addExample(reverseActivation, "myself");
+                    classifier.addExample(reverseActivation, "myself");
+                    classifier.addExample(reverseActivation, "myself");
                     classifier.addExample(reverseActivation, "myself");
                     classifier.addExample(reverseActivation, "myself");
                     classifier.addExample(reverseActivation, "myself");
@@ -178,10 +189,19 @@ export default function analyzeVideo() {
                     classifier.addExample(activation, "myself")
                     classifier.addExample(activation, "myself")
                     classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
+                    classifier.addExample(activation, "myself")
 
                     flipCanvasHorizontally(canvasRef2.current);
 
                     const reverseActivation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds');
+                    classifier.addExample(reverseActivation, "myself");
+                    classifier.addExample(reverseActivation, "myself");
+                    classifier.addExample(reverseActivation, "myself");
+                    classifier.addExample(reverseActivation, "myself");
                     classifier.addExample(reverseActivation, "myself");
                     classifier.addExample(reverseActivation, "myself");
                     classifier.addExample(reverseActivation, "myself");
@@ -209,10 +229,20 @@ export default function analyzeVideo() {
                     classifier.addExample(activation, "opponent")
                     classifier.addExample(activation, "opponent")
                     classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
 
                     flipCanvasHorizontally(canvasRef1.current);
 
                     const reverseActivation = (mobileNetModel as any).infer(canvasRef1.current, 'conv_preds');
+                    classifier.addExample(reverseActivation, "opponent");
+                    classifier.addExample(reverseActivation, "opponent");
+                    classifier.addExample(reverseActivation, "opponent");
+                    classifier.addExample(reverseActivation, "opponent");
+                    classifier.addExample(reverseActivation, "opponent");
                     classifier.addExample(reverseActivation, "opponent");
                     classifier.addExample(reverseActivation, "opponent");
                     classifier.addExample(reverseActivation, "opponent");
@@ -231,10 +261,20 @@ export default function analyzeVideo() {
                     classifier.addExample(activation, "opponent")
                     classifier.addExample(activation, "opponent")
                     classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
+                    classifier.addExample(activation, "opponent")
 
                     flipCanvasHorizontally(canvasRef2.current);
 
                     const reverseActivation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds');
+                    classifier.addExample(reverseActivation, "opponent");
+                    classifier.addExample(reverseActivation, "opponent");
+                    classifier.addExample(reverseActivation, "opponent");
+                    classifier.addExample(reverseActivation, "opponent");
+                    classifier.addExample(reverseActivation, "opponent");
                     classifier.addExample(reverseActivation, "opponent");
                     classifier.addExample(reverseActivation, "opponent");
                     classifier.addExample(reverseActivation, "opponent");
@@ -251,10 +291,11 @@ export default function analyzeVideo() {
             //     break;
         }
 
+
         if (videoRef.current) {
             videoRef.current.style.pointerEvents = 'auto'
         }
-    }, [myself || opponent])
+    }, [addExampleIndex])
 
 
     const handleModelLoad = () => {
