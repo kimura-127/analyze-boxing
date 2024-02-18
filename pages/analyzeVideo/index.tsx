@@ -141,15 +141,6 @@ export default function analyzeVideo() {
 
 
     useEffect(() => {
-        const flipCanvasHorizontally = (canvas: HTMLCanvasElement) => {
-            const context = canvas.getContext('2d');
-            // 描画コンテキストの設定を変更して左右反転
-            context?.scale(-1, 1); // X軸方向に反転
-            // 再描写
-            context?.drawImage(canvas, -canvas.width, 0, canvas.width, canvas.height);
-            // 描画設定を元に戻す
-            context?.setTransform(1, 0, 0, 1, 0, 0);
-        }
         if (addExampleIndex > 0) {
             const croppedImageData = croppedImage(videoRef.current, moveNetPoses.current, yPixelSize.current)
             switch (myself) {
@@ -167,20 +158,6 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
-
-                        flipCanvasHorizontally(canvasRef1.current);
-
-                        const reverseActivation = (mobileNetModel as any).infer(croppedImageData[0], 'conv_preds');
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
                     }
                     break;
                 case "select2":
@@ -198,20 +175,6 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
-
-                        flipCanvasHorizontally(canvasRef2.current);
-
-                        const reverseActivation = (mobileNetModel as any).infer(croppedImageData[1], 'conv_preds');
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
-                        classifier.addExample(reverseActivation, "myself");
                     }
                     break;
                 // case "select3":
@@ -238,21 +201,6 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
-
-                        flipCanvasHorizontally(canvasRef1.current);
-
-                        const reverseActivation = (mobileNetModel as any).infer(croppedImageData[0], 'conv_preds');
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
                     }
                     break;
                 case "select2":
@@ -270,21 +218,6 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
-
-                        flipCanvasHorizontally(canvasRef2.current);
-
-                        const reverseActivation = (mobileNetModel as any).infer(croppedImageData[1], 'conv_preds');
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
-                        classifier.addExample(reverseActivation, "opponent");
                     }
                     break;
                 // case "select3":
