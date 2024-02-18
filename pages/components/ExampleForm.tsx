@@ -16,6 +16,7 @@ const ExampleForm = () => {
 
 
     const addExample = (data: any) => {
+        console.log(data)
         setAddExampleIndex(addExampleIndex + 1)
         Object.entries(data).map(([key, value]) => {
             switch (value) {

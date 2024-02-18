@@ -55,6 +55,7 @@ export default function analyzeVideo() {
     const handleAnalyze = useRef(false)
     const yPixelSize = useRef(100)
     const handlePlayIndex = useRef(0)
+    const moveNetPoses = useRef<poseDetection.Pose[]>()
 
 
 
@@ -75,7 +76,8 @@ export default function analyzeVideo() {
 
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
-                if (poses.length > 1) {
+                moveNetPoses.current = poses
+                if (poses.length > 0) {
                     videoElement?.pause()
                     handlePlayIndex.current++
                     console.log(handlePlayIndex.current)
@@ -85,7 +87,7 @@ export default function analyzeVideo() {
                 }
                 setTimeout(() => { videoElement?.paused || requestAnimationFrame(animate) }, 3000)
             }
-            setTimeout(() => { requestAnimationFrame(animate) }, 3000)
+            setTimeout(() => { requestAnimationFrame(animate) }, 5000)
         } else if (moveNetModel && videoElement) {
             const animate = async () => {
 
@@ -148,152 +150,155 @@ export default function analyzeVideo() {
             // 描画設定を元に戻す
             context?.setTransform(1, 0, 0, 1, 0, 0);
         }
-        switch (myself) {
-            case "select1":
-                console.log("select1")
-                if (mobileNetModel && canvasRef1.current) {
-                    const activation = (mobileNetModel as any).infer(canvasRef1.current, 'conv_preds')
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
+        if (addExampleIndex > 0) {
+            const croppedImageData = croppedImage(videoRef.current, moveNetPoses.current, yPixelSize.current)
+            switch (myself) {
+                case "select1":
+                    console.log("select1")
+                    if (mobileNetModel && canvasRef1.current) {
+                        const activation = (mobileNetModel as any).infer(croppedImageData[0], 'conv_preds')
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
 
-                    flipCanvasHorizontally(canvasRef1.current);
+                        flipCanvasHorizontally(canvasRef1.current);
 
-                    const reverseActivation = (mobileNetModel as any).infer(canvasRef1.current, 'conv_preds');
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                }
-                break;
-            case "select2":
-                console.log("select2")
-                if (mobileNetModel && canvasRef2.current) {
-                    const activation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds')
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
-                    classifier.addExample(activation, "myself")
+                        const reverseActivation = (mobileNetModel as any).infer(croppedImageData[0], 'conv_preds');
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                    }
+                    break;
+                case "select2":
+                    console.log("select2")
+                    if (mobileNetModel && canvasRef2.current) {
+                        const activation = (mobileNetModel as any).infer(croppedImageData[1], 'conv_preds')
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
 
-                    flipCanvasHorizontally(canvasRef2.current);
+                        flipCanvasHorizontally(canvasRef2.current);
 
-                    const reverseActivation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds');
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                    classifier.addExample(reverseActivation, "myself");
-                }
-                break;
-            // case "select3":
-            //     console.log("select3")
-            //     break;
-            // case "select4":
-            //     console.log("select4")
-            //     break;
-        }
-        switch (opponent) {
-            case "select1":
-                console.log("select1")
-                if (mobileNetModel && canvasRef1.current) {
-                    const activation = (mobileNetModel as any).infer(canvasRef1.current, 'conv_preds')
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
+                        const reverseActivation = (mobileNetModel as any).infer(croppedImageData[1], 'conv_preds');
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                        classifier.addExample(reverseActivation, "myself");
+                    }
+                    break;
+                // case "select3":
+                //     console.log("select3")
+                //     break;
+                // case "select4":
+                //     console.log("select4")
+                //     break;
+            }
+            switch (opponent) {
+                case "select1":
+                    console.log("select1")
+                    if (mobileNetModel && canvasRef1.current) {
+                        const activation = (mobileNetModel as any).infer(croppedImageData[0], 'conv_preds')
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
 
-                    flipCanvasHorizontally(canvasRef1.current);
+                        flipCanvasHorizontally(canvasRef1.current);
 
-                    const reverseActivation = (mobileNetModel as any).infer(canvasRef1.current, 'conv_preds');
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                }
-                break;
-            case "select2":
-                console.log("select2")
-                if (mobileNetModel && canvasRef2.current) {
-                    const activation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds')
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
-                    classifier.addExample(activation, "opponent")
+                        const reverseActivation = (mobileNetModel as any).infer(croppedImageData[0], 'conv_preds');
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                    }
+                    break;
+                case "select2":
+                    console.log("select2")
+                    if (mobileNetModel && canvasRef2.current) {
+                        const activation = (mobileNetModel as any).infer(croppedImageData[1], 'conv_preds')
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
 
-                    flipCanvasHorizontally(canvasRef2.current);
+                        flipCanvasHorizontally(canvasRef2.current);
 
-                    const reverseActivation = (mobileNetModel as any).infer(canvasRef2.current, 'conv_preds');
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                    classifier.addExample(reverseActivation, "opponent");
-                }
-                break;
-            // case "select3":
-            //     console.log("select3")
-            //     break;
-            // case "select4":
-            //     console.log("select4")
-            //     break;
-        }
+                        const reverseActivation = (mobileNetModel as any).infer(croppedImageData[1], 'conv_preds');
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                        classifier.addExample(reverseActivation, "opponent");
+                    }
+                    break;
+                // case "select3":
+                //     console.log("select3")
+                //     break;
+                // case "select4":
+                //     console.log("select4")
+                //     break;
+            }
 
 
-        if (videoRef.current) {
-            videoRef.current.style.pointerEvents = 'auto'
+            if (videoRef.current) {
+                videoRef.current.style.pointerEvents = 'auto'
+            }
         }
     }, [addExampleIndex])
 
@@ -334,7 +339,7 @@ export default function analyzeVideo() {
         }
     }
 
-    const inputSize = 15; // シーケンス長 []の数
+    const inputSize = 10; // シーケンス長 []の数
     const featureSize = 132; // サンプル内の特徴量の数
     const outputSize = 2; // 出力の次元数,numSamplesと同じ値にすること
     const lstmUnits = 50;   // LSTMユニットの数
@@ -366,39 +371,39 @@ export default function analyzeVideo() {
         console.log("モデルロード開始開始")
 
 
-        const modelUrl = '/models/myLSTMModels/v1/lstm-model.json';
-        const lstmModel = async () => {
-            const model = await tf.loadLayersModel(modelUrl);
-            const learningRate = 0.001;
-            const optimizer = tf.train.adam(learningRate);
-            model.compile({
-                optimizer: optimizer,
-                loss:
-                    'categoricalCrossentropy' //多クラス分類のための損失関数 ※ワンホットエンコーディング必須
-                // 'sparseCategoricalCrossentropy' //多クラス分類のための損失関数
-                // 'binaryCrossentropy' //二値分類のための損失関数
-                ,
-                metrics: ['accuracy']
-            });
-            setLstmModel(model)
-        }
-        lstmModel()
+        // const modelUrl = '/models/myLSTMModels/v1/lstm-model.json';
+        // const lstmModel = async () => {
+        //     const model = await tf.loadLayersModel(modelUrl);
+        //     const learningRate = 0.001;
+        //     const optimizer = tf.train.adam(learningRate);
+        //     model.compile({
+        //         optimizer: optimizer,
+        //         loss:
+        //             'categoricalCrossentropy' //多クラス分類のための損失関数 ※ワンホットエンコーディング必須
+        //         // 'sparseCategoricalCrossentropy' //多クラス分類のための損失関数
+        //         // 'binaryCrossentropy' //二値分類のための損失関数
+        //         ,
+        //         metrics: ['accuracy']
+        //     });
+        //     setLstmModel(model)
+        // }
+        // lstmModel()
 
         // 独自のLSTMモデル用意する際のコード
-        // const lstmModel = createLSTMModel(inputSize, featureSize, outputSize, lstmUnits);
-        // setLstmModel(lstmModel)
+        const lstmModel = createLSTMModel(inputSize, featureSize, outputSize, lstmUnits);
+        setLstmModel(lstmModel)
 
-        // const learningRate = 0.001;
-        // const optimizer = tf.train.adam(learningRate);
-        // lstmModel.compile({
-        //     optimizer: optimizer,
-        //     loss:
-        //         'categoricalCrossentropy' //多クラス分類のための損失関数 ※ワンホットエンコーディング必須
-        //     // 'sparseCategoricalCrossentropy' //多クラス分類のための損失関数
-        //     // 'binaryCrossentropy' //二値分類のための損失関数
-        //     ,
-        //     metrics: ['accuracy']
-        // });
+        const learningRate = 0.001;
+        const optimizer = tf.train.adam(learningRate);
+        lstmModel.compile({
+            optimizer: optimizer,
+            loss:
+                'categoricalCrossentropy' //多クラス分類のための損失関数 ※ワンホットエンコーディング必須
+            // 'sparseCategoricalCrossentropy' //多クラス分類のための損失関数
+            // 'binaryCrossentropy' //二値分類のための損失関数
+            ,
+            metrics: ['accuracy']
+        });
 
 
         console.log("モデルロード終わり")
