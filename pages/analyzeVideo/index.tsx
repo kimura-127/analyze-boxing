@@ -53,9 +53,10 @@ export default function analyzeVideo() {
     const jabKeypoint: any = []
     const noneJabKeypoint: any = []
     const handleAnalyze = useRef(false)
-    const yPixelSize = useRef(100)
+    const yPixelSize = useRef(300)
     const handlePlayIndex = useRef(0)
     const moveNetPoses = useRef<poseDetection.Pose[]>()
+    const nextAddExampleTime = 3
 
 
 
@@ -72,12 +73,12 @@ export default function analyzeVideo() {
         setExample2Ctx(example2Ctx)
 
 
-        if (moveNetModel && videoElement && handlePlayIndex.current < 5) {
+        if (moveNetModel && videoElement && handlePlayIndex.current < 3) {
 
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
                 moveNetPoses.current = poses
-                if (poses.length > 0) {
+                if (poses.length > 1) {
                     videoElement?.pause()
                     handlePlayIndex.current++
                     console.log(handlePlayIndex.current)
@@ -87,7 +88,7 @@ export default function analyzeVideo() {
                 }
                 setTimeout(() => { videoElement?.paused || requestAnimationFrame(animate) }, 3000)
             }
-            setTimeout(() => { requestAnimationFrame(animate) }, 5000)
+            setTimeout(() => { requestAnimationFrame(animate) }, nextAddExampleTime * 1000)
         } else if (moveNetModel && videoElement) {
             const animate = async () => {
 
@@ -105,9 +106,15 @@ export default function analyzeVideo() {
                         croppedImageData.forEach((croppedImage: any) => {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
                                 const array: any[] = []
-                                result && result.length > 0 && result[0].keypoints.map((kp: any) => { array.push(kp.x, kp.y, kp.z, kp.score) }) && boxerKeypoint.push(array)
-                                    && console.log("FPS")
-                                // && console.log(result)
+                                // result && result.length > 0 && result[0].keypoints.map((kp: any) => { array.push(kp.x, kp.y, kp.z, kp.score) }) && boxerKeypoint.push(array);
+                                if (result && result.length > 0) {
+                                    result[0].keypoints.slice(11, 26).forEach(kp => {
+                                        array.push(kp.x, kp.y, kp.z, kp.score);
+                                    });
+                                    boxerKeypoint.push(array);
+                                    console.log(result)
+                                    console.log("FPS")
+                                }
                                 while (boxerKeypoint.length > inputSize) {
                                     boxerKeypoint.shift()
                                 }
@@ -158,6 +165,24 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
                     }
                     break;
                 case "select2":
@@ -175,6 +200,22 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+
                     }
                     break;
                 // case "select3":
@@ -201,12 +242,33 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
                     }
                     break;
                 case "select2":
                     console.log("select2")
                     if (mobileNetModel && canvasRef2.current) {
                         const activation = (mobileNetModel as any).infer(croppedImageData[1], 'conv_preds')
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
@@ -273,7 +335,7 @@ export default function analyzeVideo() {
     }
 
     const inputSize = 10; // シーケンス長 []の数
-    const featureSize = 132; // サンプル内の特徴量の数
+    const featureSize = 60; // サンプル内の特徴量の数
     const outputSize = 2; // 出力の次元数,numSamplesと同じ値にすること
     const lstmUnits = 50;   // LSTMユニットの数
     const numSamples = 2; // サンプル数,データの総数のこと
@@ -383,18 +445,70 @@ export default function analyzeVideo() {
     }
 
     const handlePixel = () => {
-        yPixelSize.current += 100
-        console.log(yPixelSize.current)
+        // yPixelSize.current += 100
+        // console.log(yPixelSize.current)
+
+        // 3D座標を持つ鼻、左肩、右肩のオブジェクト
+        const nose = { x: 5, y: 10, z: 5 };
+        const leftShoulder = { x: 5, y: 8, z: 5 };
+        const rightShoulder = { x: 9, y: 8, z: 5 };
+
+        // 人物の向いている角度を計算する関数（XZ平面での角度）
+        const calculateOrientationAngle = (nose: any, leftShoulder: any, rightShoulder: any) => {
+            // 肩の中点を計算
+            const midShoulder = {
+                x: (leftShoulder.x + rightShoulder.x) / 2,
+                y: (leftShoulder.y + rightShoulder.y) / 2,
+                z: (leftShoulder.z + rightShoulder.z) / 2
+            };
+
+            // 鼻と肩の中点を結ぶベクトルを計算
+            const directionVector = {
+                x: nose.x - midShoulder.x,
+                z: nose.z - midShoulder.z
+            };
+
+            // XZ平面での角度を計算（ラジアンから度に変換）
+            const angleRadians = Math.atan2(directionVector.x, directionVector.z);
+            const angleDegrees = angleRadians * (180 / Math.PI);
+
+            // 角度を正規化（0〜360度の範囲に調整）
+            return (angleDegrees + 360) % 360;
+        }
+
+        // 角度を計算して結果を表示
+        const angle = calculateOrientationAngle(nose, leftShoulder, rightShoulder);
+        console.log('人物の向いている角度:', angle.toFixed(2), '度');
+        console.log(angle)
+        Math.abs(angle - 90)
+
     }
 
     const handleSaveModel = () => {
-        const saveModel = async () => {
-            if (lstmModel) {
-                await lstmModel.save('downloads://lstm-model');
-            }
+        // const saveModel = async () => {
+        //     if (lstmModel) {
+        //         await lstmModel.save('downloads://lstm-model');
+        //     }
+        // }
+
+        // saveModel()
+        const rotateY = (vector: any, angle: any) => {
+            const rad = angle * Math.PI / 180; // 角度をラジアンに変換
+            const cos = Math.cos(rad);
+            const sin = Math.sin(rad);
+
+            return {
+                x: vector.x * cos + vector.z * sin,
+                y: vector.y,
+                z: -vector.x * sin + vector.z * cos
+            };
         }
 
-        saveModel()
+        // 例: Y軸周りに45度回転
+        const originalVector = { x: 10, y: 10, z: 10 };
+        const rotatedVector = rotateY(originalVector, 360);
+        console.log(rotatedVector);
+
     }
 
 
