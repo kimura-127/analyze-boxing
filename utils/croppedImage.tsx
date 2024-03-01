@@ -20,7 +20,6 @@ export const croppedImage = (videoElement: any, analyze: any, yPixelSize: number
                 ]
             ]);
             // 切り抜かれた画像のサイズを指定
-            // const cropSize: [number, number] = [Math.floor((item?.box?.xMax - item?.box?.xMin) * videoElement.videoWidth / 2), Math.floor((item?.box?.yMax - item?.box?.yMin) * videoElement.videoHeight / 2)];
             const cropSize: [number, number] = [
                 yPixelSize,
                 Math.floor((item?.box?.xMax - item?.box?.xMin) / (item?.box?.yMax - item?.box?.yMin) * yPixelSize)
