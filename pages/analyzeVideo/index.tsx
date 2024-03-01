@@ -58,7 +58,7 @@ export default function analyzeVideo() {
     const yPixelSize = useRef(300)
     const handlePlayIndex = useRef(0)
     const moveNetPoses = useRef<poseDetection.Pose[]>()
-    const nextAddExampleTime = 1
+    const nextAddExampleTime = 3
 
 
 
@@ -75,7 +75,7 @@ export default function analyzeVideo() {
         setExample2Ctx(example2Ctx)
 
 
-        if (moveNetModel && videoElement && handlePlayIndex.current < 1) {
+        if (moveNetModel && videoElement && handlePlayIndex.current < 4) {
 
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
@@ -100,18 +100,14 @@ export default function analyzeVideo() {
 
                 if (poses.length > 0 && mobileNetModel && blazePoseModel) {
 
-                    canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
-                    // drawSkeleton(ctx, videoElement, poses[0])
-                    // drawSkeleton(ctx, videoElement, poses[1])
-
                     const predictKeypoint = (personName: string) => {
-                        croppedImageData.forEach((croppedImage: any) => {
+                        croppedImageData.forEach((croppedImage: any, index: number) => {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
                                 const array: any[] = []
                                 if (result && result.length > 0) {
-                                    console.log(poses)
                                     // measureOrientationAngle(result[0].keypoints)
-                                    drawSkeleton(ctx, videoElement, result[0].keypoints, poses[0], yPixelSize.current)
+                                    canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                                    drawSkeleton(ctx, videoElement, result[0].keypoints, poses[index], yPixelSize.current)
                                     result[0].keypoints.slice(11, 26).forEach(kp => {
                                         array.push(kp.x, kp.y, kp.z, kp.score);
                                     });
@@ -449,8 +445,8 @@ export default function analyzeVideo() {
     }
 
     const handlePixel = () => {
-        // yPixelSize.current += 100
-        // console.log(yPixelSize.current)
+        yPixelSize.current += 100
+        console.log(yPixelSize.current)
     }
 
     const handleSaveModel = () => {
@@ -459,25 +455,26 @@ export default function analyzeVideo() {
         //         await lstmModel.save('downloads://lstm-model');
         //     }
         // }
-
         // saveModel()
-        const rotateY = (vector: any, angle: any) => {
-            const rad = angle * Math.PI / 180; // 角度をラジアンに変換
-            const cos = Math.cos(rad);
-            const sin = Math.sin(rad);
 
-            return {
-                x: vector.x * cos + vector.z * sin,
-                y: vector.y,
-                z: -vector.x * sin + vector.z * cos
-            };
-        }
+        // const rotateY = (vector: any, angle: any) => {
+        //     const rad = angle * Math.PI / 180; // 角度をラジアンに変換
+        //     const cos = Math.cos(rad);
+        //     const sin = Math.sin(rad);
 
-        // 例: Y軸周りに45度回転
-        const originalVector = { x: 10, y: 10, z: 10 };
-        const rotatedVector = rotateY(originalVector, 360);
-        console.log(rotatedVector);
+        //     return {
+        //         x: vector.x * cos + vector.z * sin,
+        //         y: vector.y,
+        //         z: -vector.x * sin + vector.z * cos
+        //     };
+        // }
 
+        // // 例: Y軸周りに45度回転
+        // const originalVector = { x: 10, y: 10, z: 10 };
+        // const rotatedVector = rotateY(originalVector, 360);
+        // console.log(rotatedVector);
+
+        console.log(tf.memory())
     }
 
 
