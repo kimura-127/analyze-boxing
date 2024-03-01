@@ -20,6 +20,8 @@ import { Tensor3D } from '@tensorflow/tfjs-core';
 import { Tensor4D } from '@tensorflow/tfjs-core';
 import { hitJudgmentState } from "@/atoms/hitJudgmentState";
 import { addExampleIndexState } from "@/atoms/addExampleIndexState";
+import { changeOrientationAngle } from "@/utils/changeOrientationAngle";
+import { measureOrientationAngle } from "@/utils/measureOrientationAngle";
 
 
 
@@ -56,7 +58,7 @@ export default function analyzeVideo() {
     const yPixelSize = useRef(300)
     const handlePlayIndex = useRef(0)
     const moveNetPoses = useRef<poseDetection.Pose[]>()
-    const nextAddExampleTime = 3
+    const nextAddExampleTime = 1
 
 
 
@@ -73,7 +75,7 @@ export default function analyzeVideo() {
         setExample2Ctx(example2Ctx)
 
 
-        if (moveNetModel && videoElement && handlePlayIndex.current < 3) {
+        if (moveNetModel && videoElement && handlePlayIndex.current < 1) {
 
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
@@ -99,21 +101,23 @@ export default function analyzeVideo() {
                 if (poses.length > 0 && mobileNetModel && blazePoseModel) {
 
                     canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
-                    drawSkeleton(ctx, videoElement, poses[0])
-                    drawSkeleton(ctx, videoElement, poses[1])
+                    // drawSkeleton(ctx, videoElement, poses[0])
+                    // drawSkeleton(ctx, videoElement, poses[1])
 
                     const predictKeypoint = (personName: string) => {
                         croppedImageData.forEach((croppedImage: any) => {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
                                 const array: any[] = []
-                                // result && result.length > 0 && result[0].keypoints.map((kp: any) => { array.push(kp.x, kp.y, kp.z, kp.score) }) && boxerKeypoint.push(array);
                                 if (result && result.length > 0) {
+                                    console.log(poses)
+                                    // measureOrientationAngle(result[0].keypoints)
+                                    drawSkeleton(ctx, videoElement, result[0].keypoints, poses[0], yPixelSize.current)
                                     result[0].keypoints.slice(11, 26).forEach(kp => {
                                         array.push(kp.x, kp.y, kp.z, kp.score);
                                     });
                                     boxerKeypoint.push(array);
                                     console.log(result)
-                                    console.log("FPS")
+                                    // console.log("FPS")
                                 }
                                 while (boxerKeypoint.length > inputSize) {
                                     boxerKeypoint.shift()
@@ -447,41 +451,6 @@ export default function analyzeVideo() {
     const handlePixel = () => {
         // yPixelSize.current += 100
         // console.log(yPixelSize.current)
-
-        // 3D座標を持つ鼻、左肩、右肩のオブジェクト
-        const nose = { x: 5, y: 10, z: 5 };
-        const leftShoulder = { x: 5, y: 8, z: 5 };
-        const rightShoulder = { x: 9, y: 8, z: 5 };
-
-        // 人物の向いている角度を計算する関数（XZ平面での角度）
-        const calculateOrientationAngle = (nose: any, leftShoulder: any, rightShoulder: any) => {
-            // 肩の中点を計算
-            const midShoulder = {
-                x: (leftShoulder.x + rightShoulder.x) / 2,
-                y: (leftShoulder.y + rightShoulder.y) / 2,
-                z: (leftShoulder.z + rightShoulder.z) / 2
-            };
-
-            // 鼻と肩の中点を結ぶベクトルを計算
-            const directionVector = {
-                x: nose.x - midShoulder.x,
-                z: nose.z - midShoulder.z
-            };
-
-            // XZ平面での角度を計算（ラジアンから度に変換）
-            const angleRadians = Math.atan2(directionVector.x, directionVector.z);
-            const angleDegrees = angleRadians * (180 / Math.PI);
-
-            // 角度を正規化（0〜360度の範囲に調整）
-            return (angleDegrees + 360) % 360;
-        }
-
-        // 角度を計算して結果を表示
-        const angle = calculateOrientationAngle(nose, leftShoulder, rightShoulder);
-        console.log('人物の向いている角度:', angle.toFixed(2), '度');
-        console.log(angle)
-        Math.abs(angle - 90)
-
     }
 
     const handleSaveModel = () => {
