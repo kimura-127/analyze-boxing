@@ -58,7 +58,7 @@ export default function analyzeVideo() {
     const yPixelSize = useRef(300)
     const handlePlayIndex = useRef(0)
     const moveNetPoses = useRef<poseDetection.Pose[]>()
-    const nextAddExampleTime = 3
+    const nextAddExampleTime = 1
 
 
 
@@ -75,7 +75,7 @@ export default function analyzeVideo() {
         setExample2Ctx(example2Ctx)
 
 
-        if (moveNetModel && videoElement && handlePlayIndex.current < 4) {
+        if (moveNetModel && videoElement && handlePlayIndex.current < 1) {
 
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
@@ -108,12 +108,13 @@ export default function analyzeVideo() {
                                     // measureOrientationAngle(result[0].keypoints)
                                     canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
                                     drawSkeleton(ctx, videoElement, result[0].keypoints, poses[index], yPixelSize.current)
-                                    result[0].keypoints.slice(11, 26).forEach(kp => {
+                                    result[0].keypoints.slice(11, 26).forEach((kp: any) => {
                                         array.push(kp.x, kp.y, kp.z, kp.score);
                                     });
                                     boxerKeypoint.push(array);
                                     console.log(result)
                                     // console.log("FPS")
+                                    croppedImage.dispose()
                                 }
                                 while (boxerKeypoint.length > inputSize) {
                                     boxerKeypoint.shift()
@@ -137,7 +138,6 @@ export default function analyzeVideo() {
                         });
                     }
                 }
-
                 videoElement?.paused || requestAnimationFrame(animate)
             }
             requestAnimationFrame(animate)
@@ -183,6 +183,7 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
+                        activation.dispose()
                     }
                     break;
                 case "select2":
@@ -215,7 +216,7 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
-
+                        activation.dispose()
                     }
                     break;
                 // case "select3":
@@ -253,6 +254,7 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
+                        activation.dispose()
                     }
                     break;
                 case "select2":
@@ -280,6 +282,7 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
+                        activation.dispose()
                     }
                     break;
                 // case "select3":
@@ -290,6 +293,9 @@ export default function analyzeVideo() {
                 //     break;
             }
 
+            croppedImageData.forEach((croppedImage: any) => {
+                croppedImage.dispose()
+            });
 
             if (videoRef.current) {
                 videoRef.current.style.pointerEvents = 'auto'
