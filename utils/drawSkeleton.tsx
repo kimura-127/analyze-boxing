@@ -5,12 +5,22 @@ export const drawSkeleton = (ctx: any, videoElement: any, keypoints: any, poses:
         ctx.lineWidth = 2;
         const box = poses.box; // PoseNetによるバウンディングボックスの情報
 
+        const leftTop = [box?.xMin * 700 * 0.85, box?.yMin * 400]
+        const rightTop = [box?.xMax * 700 * 1.15, box?.yMin * 400]
+        const leftUnder = [box?.xMin * 700 * 0.85, box?.yMax * 400]
+        const rightUnder = [box?.xMax * 700 * 1.15, box?.yMax * 400]
+
+        ctx.beginPath();
+        ctx.moveTo(leftTop[0], leftTop[1])
+        ctx.lineTo(rightTop[0], rightTop[1])
+        ctx.lineTo(rightUnder[0], rightUnder[1])
+        ctx.lineTo(leftUnder[0], leftUnder[1])
+        ctx.lineTo(leftTop[0], leftTop[1])
+        ctx.closePath();
+        ctx.stroke();
+
         keypoints.forEach((keypoint: any) => {
-            if (keypoint.score > 0.01) {
-                const leftTop = [box?.xMin * 700, box?.yMin * 400]
-                const rightTop = [box?.xMax * 700, box?.yMin * 400]
-                const leftUnder = [box?.xMin * 700, box?.yMax * 400]
-                const rightUnder = [box?.xMax * 700, box?.yMax * 400]
+            if (keypoint.score > 0.3) {
 
                 const xMinLarge = 1
                 const xMaxLarge = 1
@@ -28,18 +38,10 @@ export const drawSkeleton = (ctx: any, videoElement: any, keypoints: any, poses:
 
                 const finalX = canvasXPixeltoBox + (boxWidth * keypointX)
                 const finalY = canvasYPixeltoBox + (boxHeight * keypointY)
-                // console.log(finalX, finalY, keypoint.x, keypoint.y, keypointX, keypointY)
-                // console.log(videoElement.videoWidth, ctx.canvas.width)
 
-                // キャンバス上での正しい位置にキーポイントを描画
                 ctx.beginPath();
                 ctx.textAlign = "center"
                 ctx.arc(finalX, finalY, 3, 0, 2 * Math.PI);
-                ctx.moveTo(leftTop[0], leftTop[1])
-                ctx.lineTo(rightTop[0], rightTop[1])
-                ctx.lineTo(rightUnder[0], rightUnder[1])
-                ctx.lineTo(leftUnder[0], leftUnder[1])
-                ctx.lineTo(leftTop[0], leftTop[1])
                 ctx.closePath();
                 ctx.stroke();
                 // ctx.fill();

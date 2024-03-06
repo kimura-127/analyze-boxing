@@ -1,0 +1,18 @@
+/* styles/ImageCard.module.css */
+.card {
+    margin: 1rem;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.image {
+    width: 100%;
+    /* 画像がコンテナの幅に合わせて伸縮するように */
+    height: 15vw;
+    /* 画像のアスペクト比を保つ */
+}
+
+.description {
+    padding: 0.5rem;
+    text-align: center;
+}
