@@ -8,7 +8,7 @@ export const blazePoseModelLoad = async () => {
     const blazePoseDetector = await poseDetection.createDetector(poseDetection.SupportedModels.BlazePose, {
         runtime: 'tfjs',
         enableSmoothing: true,
-        modelType: 'heavy'
+        modelType: 'full'
         // runtime: 'mediapipe',
         // solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/pose'
     });

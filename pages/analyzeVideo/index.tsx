@@ -41,11 +41,11 @@ export default function analyzeVideo() {
     const [mobileNetModel, setMobileNetModel] = useState<mobilenet.MobileNet | null>(null)
     const [moveNetModel, setMoveNetModel] = useState<poseDetection.PoseDetector | null>(null)
     const [blazePoseModel, setBlazePoseModel] = useState<poseDetection.PoseDetector>()
-    const classifier = knnClassifier.create();
     const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null)
     const [example1Ctx, setExample1Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
     const [example2Ctx, setExample2Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
     // const [lstmModel, setLstmModel] = useState<tf.Sequential>()
+    const classifier = knnClassifier.create();
     const [lstmModel, setLstmModel] = useState<any>()
     const [xTrain, setXTrain] = useState<tf.Tensor3D>()
     const [xPredict, setXPredict] = useState<tf.Tensor3D>()
@@ -99,21 +99,21 @@ export default function analyzeVideo() {
 
 
                 if (poses.length > 0 && mobileNetModel && blazePoseModel) {
-
+                    console.log(poses)
                     const predictKeypoint = (personName: string) => {
                         croppedImageData.forEach((croppedImage: any, index: number) => {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
                                 const array: any[] = []
                                 if (result && result.length > 0) {
-                                    // measureOrientationAngle(result[0].keypoints)
+                                    const arrayKeypoint = measureOrientationAngle(result[0].keypoints)
                                     canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
                                     drawSkeleton(ctx, videoElement, result[0].keypoints, poses[index], yPixelSize.current)
-                                    result[0].keypoints.slice(11, 26).forEach((kp: any) => {
+                                    arrayKeypoint.forEach((kp: any) => {
                                         array.push(kp.x, kp.y, kp.z, kp.score);
                                     });
                                     boxerKeypoint.push(array);
+                                    console.log(boxerKeypoint)
                                     console.log(result)
-                                    // console.log("FPS")
                                     croppedImage.dispose()
                                 }
                                 while (boxerKeypoint.length > inputSize) {
@@ -148,7 +148,8 @@ export default function analyzeVideo() {
 
 
     useEffect(() => {
-        if (addExampleIndex > 0) {
+        if (addExampleIndex > 0 && videoRef.current) {
+            videoRef.current.style.pointerEvents = 'auto'
             const croppedImageData = croppedImage(videoRef.current, moveNetPoses.current, yPixelSize.current)
             switch (myself) {
                 case "select1":
@@ -183,6 +184,9 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+
                         activation.dispose()
                     }
                     break;
@@ -216,6 +220,14 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+                        classifier.addExample(activation, "myself")
+
                         activation.dispose()
                     }
                     break;
@@ -254,6 +266,15 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+
                         activation.dispose()
                     }
                     break;
@@ -282,6 +303,22 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+                        classifier.addExample(activation, "opponent")
+
                         activation.dispose()
                     }
                     break;
@@ -296,10 +333,6 @@ export default function analyzeVideo() {
             croppedImageData.forEach((croppedImage: any) => {
                 croppedImage.dispose()
             });
-
-            if (videoRef.current) {
-                videoRef.current.style.pointerEvents = 'auto'
-            }
         }
     }, [addExampleIndex])
 
@@ -315,6 +348,7 @@ export default function analyzeVideo() {
             setMobileNetModel(mobileNetModel)
             const blazePoseModel = await blazePoseModelLoad()
             setBlazePoseModel(blazePoseModel)
+
 
             const yTrain = tf.tensor2d([[1, 0], [0, 1]], [numSamples, outputSize]);
             // const predict = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
