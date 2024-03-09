@@ -6,16 +6,6 @@ import ImageCard from './components/ImageCard';
 const Home = () => {
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <nav className={styles.nav}>
-          <ul className={styles.navList}>
-            <li className={styles.navItem}>ホーム</li>
-            <li className={styles.navItem}>セクション1</li>
-            <li className={styles.navItem}>セクション2</li>
-            <li className={styles.navItem}>お問い合わせ</li>
-          </ul>
-        </nav>
-      </header>
       <main className={styles.main}>
         <h1 className={styles.title}>チャットボード</h1>
         <div className={styles.cardContainer}>
