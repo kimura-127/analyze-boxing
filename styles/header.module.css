@@ -1,0 +1,61 @@
+.header {
+    width: 100%;
+    height: 60px;
+    /* ヘッダーの高さ */
+    position: fixed;
+    background-color: black;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    /* ロゴとナビゲーションを左右に配置 */
+    align-items: center;
+    padding: 0 20px;
+    /* 左右のパディング */
+}
+
+.logoContainer {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 50px;
+    /* ロゴの高さを50pxに設定 */
+    width: auto;
+    /* 幅は自動調整 */
+    margin-right: 10px;
+    /* テキストとの間隔 */
+}
+
+.appName {
+    color: white;
+    /* アプリ名の色 */
+    font-size: 1.5rem;
+    /* アプリ名のサイズ */
+    font-weight: bold;
+    /* フォントの太さ */
+}
+
+
+.nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navList {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 2rem;
+}
+
+.navItem {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.navItem:hover {
+    background-color: #555;
+}
