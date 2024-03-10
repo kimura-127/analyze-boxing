@@ -1,3 +1,14 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
 .main {
   display: flex;
   /* Flexコンテナとして設定 */
@@ -7,7 +18,7 @@
   /* 子要素を縦方向の中央に配置 */
   align-items: center;
   /* 子要素を横方向の中央に配置 */
-  min-height: 66vh;
+  min-height: 85vh;
   /* 画面の高さの3分の2 */
   text-align: center;
   /* テキストを中央寄せ */
@@ -16,27 +27,64 @@
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
-  /* 画像が中央に来るように */
+  /* padding-bottom: 100vh; */
+  animation-name: fadeIn;
+  /* アニメーションの名前を指定 */
+  animation-duration: 5s;
+  /* アニメーションの持続時間を指定 */
+  animation-fill-mode: forwards;
+  /* アニメーションが終わった状態を保持 */
+  position: relative;
+
 }
+
+.main:before {
+  content: '';
+  /* 疑似要素にはcontentプロパティが必須 */
+  position: absolute;
+  /* 親要素（.main）に対して絶対位置指定 */
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5);
+  /* 半透明の黒色オーバーレイ */
+  z-index: 1;
+  /* オーバーレイをコンテンツの下に表示 */
+}
+
+
+.textContainer {
+  position: absolute;
+  /* コンテナを絶対位置に */
+  top: 50%;
+  /* 上から50%の位置に */
+  left: 4rem;
+  /* 左から2remの位置に */
+  transform: translateY(-50%);
+  /* Y軸で上に50%ずらして中央に来るように調整 */
+  max-width: 600px;
+  /* テキストコンテナの最大幅 */
+  z-index: 2;
+}
+
 
 .title {
   margin: 0;
   /* タイトルの余白を取り除く */
+  position: relative;
+  z-index: 2;
 }
 
 .transferButton {
   margin-top: 2rem;
   /* 転移ボタンの上の余白を調整 */
   /* 他のスタイルはそのまま */
+  position: relative;
+  z-index: 2;
 }
 
 
-.cardContainer {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
 
 .transferButton {
   margin-top: 2rem;
@@ -54,6 +102,51 @@
   background-color: #0056b3;
 }
 
+.usecaseContainer {
+  border: 2px solid #5b5b5b;
+  background-color: #ffffff;
+  padding: 2rem;
+  margin: 2rem auto;
+  margin-top: 10rem;
+  /* 両側に自動で間隔を空ける */
+  height: 700px;
+  /* 高さを300pxに増やす */
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+  width: 80%;
+  /* 幅を80%にする */
+  /* max-width: 960px; */
+  /* 最大幅を指定する場合 */
+}
+
+.usecaseTitle {
+  color: black;
+}
+
+.usecase {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-bottom: 4rem;
+  /* 追加: 各usecase要素間の余白 */
+}
+
+.usecaseImage {
+  height: 250px;
+  margin-right: 20rem;
+  border-radius: 15px;
+  /* 追加: 画像とテキストの間に余白を設定 */
+}
+
+.usecaseItem {
+  color: black;
+  /* 必要に応じてpaddingやmarginを調整 */
+}
+
+
 .imageContainer {
   display: flex;
   justify-content: space-around;
@@ -61,7 +154,7 @@
   overflow-x: auto;
   padding: 1rem;
   gap: 1rem;
-  padding-top: 12rem;
+  padding-top: 10rem;
 }
 
 /* 以下のメディアクエリでレスポンシブ対応も可能 */
