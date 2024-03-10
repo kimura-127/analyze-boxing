@@ -33,6 +33,7 @@
     align-items: center;
 }
 
+
 .logo {
     height: 50px;
     /* ロゴの高さを50pxに設定 */
@@ -49,8 +50,13 @@
     /* アプリ名のサイズ */
     font-weight: bold;
     /* フォントの太さ */
+    transition: color 0.3s ease;
+    /* 色が変わるスピードとイージングを設定 */
 }
 
+.appName:hover {
+    color: aqua;
+}
 
 .nav {
     display: flex;
@@ -68,9 +74,10 @@
 .navItem {
     padding: 0.5rem 1rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 1s ease;
 }
 
 .navItem:hover {
     background-color: #555;
+    color: aqua;
 }

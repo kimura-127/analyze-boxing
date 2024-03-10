@@ -1,17 +1,23 @@
 import styles from '../../styles/header.module.css'
+import Link from 'next/link';
 
 const Header = () => {
     return (
         <header className={styles.header}>
-            <div className={styles.logoContainer}>
-                <img src="/favicon.ico" alt="logo" className={styles.logo} />
-                <span className={styles.appName}>AnalyzeBoxing</span>
-            </div>
+            <Link href="/">
+                <div className={styles.logoContainer}>
+                    <img src="/favicon.ico" alt="logo" className={styles.logo} />
+                    <span className={styles.appName}>AnalyzeBoxing</span>
+                </div>
+            </Link>
             <nav className={styles.nav}>
                 <ul className={styles.navList}>
-                    <li className={styles.navItem}>ホーム</li>
-                    <li className={styles.navItem}>セクション1</li>
-                    <li className={styles.navItem}>セクション2</li>
+                    <Link href="/">
+                        <li className={styles.navItem}>ホーム</li>
+                    </Link>
+                    <Link href="/analyzeVideo">
+                        <li className={styles.navItem}>分析画面</li>
+                    </Link>
                     <li className={styles.navItem}>お問い合わせ</li>
                 </ul>
             </nav>
