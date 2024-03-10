@@ -1,3 +1,13 @@
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
 .header {
     width: 100%;
     height: 60px;
@@ -10,6 +20,12 @@
     /* ロゴとナビゲーションを左右に配置 */
     align-items: center;
     padding: 0 20px;
+    animation-name: fadeIn;
+    /* アニメーションの名前を指定 */
+    animation-duration: 3s;
+    /* アニメーションの持続時間を指定 */
+    animation-fill-mode: forwards;
+    /* アニメーションが終わった状態を保持 */
 }
 
 .logoContainer {

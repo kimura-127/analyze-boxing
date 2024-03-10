@@ -24,17 +24,17 @@ const Home = () => {
           <RiBoxingFill />
           AnalyzeBoxingの使い方
         </h2>
-        {/* <div className={styles.usecase}>
-          <img className={styles.usecaseImage} src="/ImageCard1.jpg" alt="Usecase Image" />
-          <div className={styles.usecaseItem}>
-            <h3>機能1</h3>
-            <p>機能1についての説明。</p>
-          </div>
-        </div> */}
         <ImageCard src="/ImageCard1.jpg" alt="Usecase Image" header="対戦の様子を撮影" description="自分の試合・スパーリングの様子を撮影" />
         <ImageCard src="/ImageCard2.jpg" alt="Usecase Image" header="自分か相手かAIに学習" description="AIに自分と対戦相手を学習させる" />
         <ImageCard src="/ImageCard3.jpg" alt="Usecase Image" header="リアルタイムで分析処理" description="AnalyzeBoxingを用いて動画を分析" />
       </div>
+      <footer className={styles.footer}>
+        <div className={styles.footerContent}>
+          <a href="/terms" className={styles.footerLink}>利用規約</a>
+          <a href="/privacy" className={styles.footerLink}>プライバシーポリシー</a>
+        </div>
+        <p>Copyright © 2024 - All right reserved by AnalyzeBoxing</p>
+      </footer>
     </div>
   );
 };

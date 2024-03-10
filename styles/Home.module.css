@@ -146,6 +146,47 @@
   /* 必要に応じてpaddingやmarginを調整 */
 }
 
+.footer {
+  background-color: #000000;
+  /* グレーの背景色 */
+  padding: 1rem 0;
+  /* 上下にパディングを追加 */
+  text-align: center;
+  /* テキストを中央揃えにする */
+}
+
+.footerContent {
+  max-width: 1200px;
+  /* コンテンツの最大幅を設定 */
+  margin: 0 auto;
+  /* 横方向のマージンを自動にして中央揃えに */
+  display: flex;
+  /* Flexboxを有効にする */
+  justify-content: center;
+  /* 水平方向に中央揃えに */
+  align-items: center;
+  /* 垂直方向に中央揃えに */
+  gap: 2rem;
+  /* リンクの間にスペースを設定 */
+}
+
+.footerLink {
+  color: #ffffff;
+  /* リンクの色 */
+  text-decoration: none;
+  /* アンダーラインを無くす */
+  padding: 0.5rem;
+  /* リンクの周りにパディングを追加 */
+  font-weight: bold;
+  /* フォントを太字にする */
+}
+
+.footerLink:hover {
+  text-decoration: underline;
+  /* ホバー時にアンダーラインを表示 */
+}
+
+
 
 /* 以下のメディアクエリでレスポンシブ対応も可能 */
 @media (max-width: 600px) {
