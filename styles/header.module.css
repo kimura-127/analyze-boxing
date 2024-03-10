@@ -10,7 +10,6 @@
     /* ロゴとナビゲーションを左右に配置 */
     align-items: center;
     padding: 0 20px;
-    /* 左右のパディング */
 }
 
 .logoContainer {
