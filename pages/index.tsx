@@ -24,30 +24,16 @@ const Home = () => {
           <RiBoxingFill />
           AnalyzeBoxingの使い方
         </h2>
-        <div className={styles.usecase}>
+        {/* <div className={styles.usecase}>
           <img className={styles.usecaseImage} src="/ImageCard1.jpg" alt="Usecase Image" />
           <div className={styles.usecaseItem}>
             <h3>機能1</h3>
             <p>機能1についての説明。</p>
           </div>
-        </div>
-      </div>
-      <div className={styles.imageContainer}>
-        <ImageCard
-          src="/ImageCard1.jpg"
-          alt="First image description"
-          description="ここには最初の画像の説明が入ります。"
-        />
-        <ImageCard
-          src="/ImageCard2.jpg"
-          alt="Second image description"
-          description="ここには2番目の画像の説明が入ります。"
-        />
-        <ImageCard
-          src="/ImageCard3.jpg"
-          alt="Third image description"
-          description="ここには3番目の画像の説明が入ります。"
-        />
+        </div> */}
+        <ImageCard src="/ImageCard1.jpg" alt="Usecase Image" header="対戦の様子を撮影" description="自分の試合・スパーリングの様子を撮影" />
+        <ImageCard src="/ImageCard2.jpg" alt="Usecase Image" header="自分か相手かAIに学習" description="AIに自分と対戦相手を学習させる" />
+        <ImageCard src="/ImageCard3.jpg" alt="Usecase Image" header="リアルタイムで分析処理" description="AnalyzeBoxingを用いて動画を分析" />
       </div>
     </div>
   );

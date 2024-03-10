@@ -1,18 +1,25 @@
-/* styles/ImageCard.module.css */
-.card {
-    margin: 1rem;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.usecase {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
 }
 
-.image {
-    width: 100%;
-    /* 画像がコンテナの幅に合わせて伸縮するように */
-    height: 15vw;
-    /* 画像のアスペクト比を保つ */
+.usecaseImage {
+    height: 250px;
+    margin-right: 10rem;
+    border-radius: 15px;
 }
 
-.description {
-    padding: 0.5rem;
+.usecaseItem {
+    color: black;
+    width: 300px;
     text-align: center;
 }
+
+.header {
+    margin: 15px;
+    line-height: 100px;
+}
+
+.description {}

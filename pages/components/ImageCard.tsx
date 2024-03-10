@@ -5,14 +5,18 @@ import styles from '../../styles/ImageCard.module.css'; // スタイルを適用
 interface ImageCardProps {
     src: string;
     alt: string;
+    header: string;
     description: string;
 }
 
-const ImageCard: React.FC<ImageCardProps> = ({ src, alt, description }) => {
+const ImageCard: React.FC<ImageCardProps> = ({ src, alt, header, description }) => {
     return (
-        <div className={styles.card}>
-            <img src={src} alt={alt} className={styles.image} />
-            <p className={styles.description}>{description}</p>
+        <div className={styles.usecase}>
+            <img className={styles.usecaseImage} src={src} alt={alt} />
+            <div className={styles.usecaseItem}>
+                <h3 className={styles.header}>{header}</h3>
+                <p className={styles.description}>{description}</p>
+            </div>
         </div>
     );
 };

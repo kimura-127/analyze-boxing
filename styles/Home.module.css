@@ -109,7 +109,7 @@
   margin: 2rem auto;
   margin-top: 10rem;
   /* 両側に自動で間隔を空ける */
-  height: 700px;
+  height: 1000px;
   /* 高さを300pxに増やす */
   border-radius: 15px;
   display: flex;
@@ -146,16 +146,6 @@
   /* 必要に応じてpaddingやmarginを調整 */
 }
 
-
-.imageContainer {
-  display: flex;
-  justify-content: space-around;
-  /* これでカード間に均等なスペースを作る */
-  overflow-x: auto;
-  padding: 1rem;
-  gap: 1rem;
-  padding-top: 10rem;
-}
 
 /* 以下のメディアクエリでレスポンシブ対応も可能 */
 @media (max-width: 600px) {
