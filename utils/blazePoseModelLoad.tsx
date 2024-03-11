@@ -9,8 +9,6 @@ export const blazePoseModelLoad = async () => {
         runtime: 'tfjs',
         enableSmoothing: true,
         modelType: 'full'
-        // runtime: 'mediapipe',
-        // solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/pose'
     });
     return blazePoseDetector
 }
