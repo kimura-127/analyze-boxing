@@ -20,7 +20,6 @@ export const knnClassifierPredict = async (mobileNetModel: any, croppedImage: an
             return null;
         }
     } finally {
-        // ここで確実にテンソルを解放する
         croppedImage.dispose();
         if (feature) {
             feature.dispose();

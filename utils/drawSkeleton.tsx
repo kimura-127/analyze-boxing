@@ -3,7 +3,7 @@ export const drawSkeleton = (ctx: any, videoElement: any, keypoints: any, poses:
         ctx.fillStyle = "white";
         ctx.strokeStyle = "white";
         ctx.lineWidth = 2;
-        const box = poses.box; // PoseNetによるバウンディングボックスの情報
+        const box = poses.box;
 
         const leftTop = [box?.xMin * 700 * 0.85, box?.yMin * 400]
         const rightTop = [box?.xMax * 700 * 1.15, box?.yMin * 400]

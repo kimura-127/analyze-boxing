@@ -16,12 +16,8 @@ import { drawExample } from "@/utils/drawExample";
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
 import { croppedImage } from "@/utils/croppedImage";
 import { knnClassifierPredict } from "@/utils/knnClassifierPredict";
-import { Tensor3D } from '@tensorflow/tfjs-core';
-import { Tensor4D } from '@tensorflow/tfjs-core';
 import { hitJudgmentState } from "@/atoms/hitJudgmentState";
 import { addExampleIndexState } from "@/atoms/addExampleIndexState";
-import { changeOrientationAngle } from "@/utils/changeOrientationAngle";
-import { measureOrientationAngle } from "@/utils/measureOrientationAngle";
 
 
 
@@ -44,7 +40,6 @@ export default function analyzeVideo() {
     const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null)
     const [example1Ctx, setExample1Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
     const [example2Ctx, setExample2Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
-    // const [lstmModel, setLstmModel] = useState<tf.Sequential>()
     const classifier = knnClassifier.create();
     const [lstmModel, setLstmModel] = useState<any>()
     const [xTrain, setXTrain] = useState<tf.Tensor3D>()
@@ -104,14 +99,12 @@ export default function analyzeVideo() {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
                                 const array: any[] = []
                                 if (result && result.length > 0) {
-                                    const arrayKeypoint = measureOrientationAngle(result[0].keypoints3D)
                                     canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
                                     drawSkeleton(ctx, videoElement, result[0].keypoints, poses[index], yPixelSize.current)
-                                    arrayKeypoint.forEach((kp: any) => {
+                                    result[0].keypoints.slice(11, 26).forEach((kp: any) => {
                                         array.push(kp.x, kp.y, kp.z, kp.score);
                                     });
                                     boxerKeypoint.push(array);
-                                    // console.log(boxerKeypoint)
                                     // console.log(result)
                                     croppedImage.dispose()
                                 }
