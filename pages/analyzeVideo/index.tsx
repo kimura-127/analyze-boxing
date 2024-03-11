@@ -80,7 +80,7 @@ export default function analyzeVideo() {
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
                 moveNetPoses.current = poses
-                if (poses.length > 1) {
+                if (poses.length > 0) {
                     videoElement?.pause()
                     handlePlayIndex.current++
                     console.log(handlePlayIndex.current)
@@ -99,21 +99,20 @@ export default function analyzeVideo() {
 
 
                 if (poses.length > 0 && mobileNetModel && blazePoseModel) {
-                    console.log(poses)
                     const predictKeypoint = (personName: string) => {
                         croppedImageData.forEach((croppedImage: any, index: number) => {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
                                 const array: any[] = []
                                 if (result && result.length > 0) {
-                                    const arrayKeypoint = measureOrientationAngle(result[0].keypoints)
+                                    const arrayKeypoint = measureOrientationAngle(result[0].keypoints3D)
                                     canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
                                     drawSkeleton(ctx, videoElement, result[0].keypoints, poses[index], yPixelSize.current)
                                     arrayKeypoint.forEach((kp: any) => {
                                         array.push(kp.x, kp.y, kp.z, kp.score);
                                     });
                                     boxerKeypoint.push(array);
-                                    console.log(boxerKeypoint)
-                                    console.log(result)
+                                    // console.log(boxerKeypoint)
+                                    // console.log(result)
                                     croppedImage.dispose()
                                 }
                                 while (boxerKeypoint.length > inputSize) {
