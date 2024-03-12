@@ -19,6 +19,7 @@ import { knnClassifierPredict } from "@/utils/knnClassifierPredict";
 import { hitJudgmentState } from "@/atoms/hitJudgmentState";
 import { addExampleIndexState } from "@/atoms/addExampleIndexState";
 import { createLSTMModel } from "@/utils/createLSTMModel";
+import styles from "../../styles/analyzeVideo.module.css"
 
 
 
@@ -378,39 +379,52 @@ export default function analyzeVideo() {
 
 
     return (
-        <>
-            <video
-                ref={videoRef}
-                style={{ height: '400px', width: '700px' }}
-                height="400px"
-                width="700px"
-                controls
-                playsInline
-                src={videoSrc}
-                onPlay={handlePlay}
-                preload="metadata"
-            />
-            <canvas
-                ref={canvasRef}
-                width="700px"
-                height="400px"
-                style={{ position: 'fixed', top: '0', left: '0', height: '400px', width: '700px', pointerEvents: 'none' }}
-            />
-            <canvas ref={canvasRef1} style={{ width: "100px", height: "240px" }} />
-            <canvas ref={canvasRef2} style={{ width: "100px", height: "240px" }} />
+        <div className={styles.container}>
+            <div className={styles.analyzeContainer}>
+                <video
+                    ref={videoRef}
+                    className={styles.video}
+                    height="400px"
+                    width="700px"
+                    controls
+                    playsInline
+                    src={videoSrc}
+                    onPlay={handlePlay}
+                    preload="metadata"
+                />
+                <canvas
+                    ref={canvasRef}
+                    width="700px"
+                    height="400px"
+                    className={styles.canvas}
+                />
+            </div>
+            <div className={styles.spaceContainer}>
+                <div className={styles.space} >
+                    <div className={styles.indexSpace} />
+                    <div className={styles.form}>
+                        <Form />
+                        <button onClick={handleModelLoad}>分析モデルをロードする</button>
+                        <button onClick={handleLstmLoad}>LSTMモデルロードボタン</button>
+                        <button onClick={handleSet}>通常時に設定</button>
+                        <button onClick={handleJabSet}>ジャブに設定</button>
+                        <button onClick={handleJabSet2}>ジャブ2に設定</button>
+                        <button onClick={handleLearn}>学習</button>
+                        <button onClick={handleAddAnalyze}>分析処理追加</button>
+                        <button onClick={handlePixel}>ビクセル100プラス</button>
+                        <button onClick={handleSaveModel}>モデルセーブ</button>
+                    </div>
+                </ div>
+                <div className={styles.canvasContainer}>
+                    <div className={styles.subCanvasContainer}>
+                        <canvas ref={canvasRef1} className={styles.subCanvas} />
+                        <canvas ref={canvasRef2} className={styles.subCanvas} />
+                    </div>
+                    <ExampleForm />
+                </div>
+            </div>
             {/* <canvas ref={canvasRef3} style={{ width: "100px", height: "100px" }} /> */}
             {/* <canvas ref={canvasRef4} style={{ width: "100px", height: "100px" }} /> */}
-            <ExampleForm />
-            <Form />
-            <button onClick={handleModelLoad}>分析モデルをロードする</button>
-            <button onClick={handleLstmLoad}>LSTMモデルロードボタン</button>
-            <button onClick={handleSet}>通常時に設定</button>
-            <button onClick={handleJabSet}>ジャブに設定</button>
-            <button onClick={handleJabSet2}>ジャブ2に設定</button>
-            <button onClick={handleLearn}>学習</button>
-            <button onClick={handleAddAnalyze}>分析処理追加</button>
-            <button onClick={handlePixel}>ビクセル100プラス</button>
-            <button onClick={handleSaveModel}>モデルセーブ</button>
-        </>
+        </div>
     )
 }
