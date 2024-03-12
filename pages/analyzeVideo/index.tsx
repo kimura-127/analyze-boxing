@@ -18,6 +18,7 @@ import { croppedImage } from "@/utils/croppedImage";
 import { knnClassifierPredict } from "@/utils/knnClassifierPredict";
 import { hitJudgmentState } from "@/atoms/hitJudgmentState";
 import { addExampleIndexState } from "@/atoms/addExampleIndexState";
+import { createLSTMModel } from "@/utils/createLSTMModel";
 
 
 
@@ -48,6 +49,7 @@ export default function analyzeVideo() {
     const [xTestPredict, setXTestPredict] = useState<tf.Tensor3D>()
     const boxerKeypoint: any = []
     const jabKeypoint: any = []
+    const jabKeypoint2: any = []
     const noneJabKeypoint: any = []
     const handleAnalyze = useRef(false)
     const yPixelSize = useRef(300)
@@ -70,12 +72,12 @@ export default function analyzeVideo() {
         setExample2Ctx(example2Ctx)
 
 
-        if (moveNetModel && videoElement && handlePlayIndex.current < 1) {
+        if (moveNetModel && videoElement && handlePlayIndex.current < 2) {
 
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
                 moveNetPoses.current = poses
-                if (poses.length > 0) {
+                if (poses.length > 1) {
                     videoElement?.pause()
                     handlePlayIndex.current++
                     console.log(handlePlayIndex.current)
@@ -101,11 +103,15 @@ export default function analyzeVideo() {
                                 if (result && result.length > 0) {
                                     canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
                                     drawSkeleton(ctx, videoElement, result[0].keypoints, poses[index], yPixelSize.current)
-                                    result[0].keypoints.slice(11, 26).forEach((kp: any) => {
-                                        array.push(kp.x, kp.y, kp.z, kp.score);
-                                    });
+                                    // result[0].keypoints.forEach((kp: any) => {
+                                    //     array.push(kp.x, kp.y, kp.z, kp.score);
+                                    // });
+
+                                    // array.push(result[0].keypoints[13].x, result[0].keypoints[13].y, result[0].keypoints[13].z, result[0].keypoints[13].score);
+                                    // array.push(result[0].keypoints[15].x, result[0].keypoints[15].y, result[0].keypoints[15].z, result[0].keypoints[15].score);
+                                    array.push(result[0].keypoints[11].y - result[0].keypoints[13].y);
                                     boxerKeypoint.push(array);
-                                    // console.log(result)
+                                    console.log(result)
                                     croppedImage.dispose()
                                 }
                                 while (boxerKeypoint.length > inputSize) {
@@ -126,7 +132,7 @@ export default function analyzeVideo() {
                         const xTrain = tf.tensor3d([boxerKeypoint, boxerKeypoint], [numSamples, inputSize, featureSize]);
                         const prediction: any = lstmModel.predict(xTrain);
                         prediction.array().then((array: any) => {
-                            console.log(array[0][0].toFixed(1), array[0][1].toFixed(1)); // この配列には、予測された値が含まれます。
+                            console.log(array[0][0].toFixed(1), array[0][1].toFixed(1));
                         });
                     }
                 }
@@ -155,30 +161,6 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-
                         activation.dispose()
                     }
                     break;
@@ -194,32 +176,6 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
                         classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-
                         activation.dispose()
                     }
                     break;
@@ -242,31 +198,6 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-
                         activation.dispose()
                     }
                     break;
@@ -280,37 +211,6 @@ export default function analyzeVideo() {
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
                         classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-
                         activation.dispose()
                     }
                     break;
@@ -321,6 +221,7 @@ export default function analyzeVideo() {
                 //     console.log("select4")
                 //     break;
             }
+
 
             croppedImageData.forEach((croppedImage: any) => {
                 croppedImage.dispose()
@@ -366,32 +267,11 @@ export default function analyzeVideo() {
         }
     }
 
-    const inputSize = 10; // シーケンス長 []の数
-    const featureSize = 60; // サンプル内の特徴量の数
+    const inputSize = 40; // シーケンス長 []の数
+    const featureSize = 1; // サンプル内の特徴量の数
     const outputSize = 2; // 出力の次元数,numSamplesと同じ値にすること
     const lstmUnits = 50;   // LSTMユニットの数
     const numSamples = 2; // サンプル数,データの総数のこと
-
-
-
-    const createLSTMModel = (inputSize: any, featureSize: any, outputSize: any, lstmUnits: any) => {
-        const model = tf.sequential();
-
-        // LSTMレイヤーの追加
-        model.add(tf.layers.lstm({
-            units: lstmUnits,
-            inputShape: [inputSize, featureSize]
-        }));
-
-        // 出力レイヤーの追加
-        model.add(tf.layers.dense({
-            units: outputSize, activation:
-                'softmax'
-            // 'sigmoid'
-        }));
-
-        return model;
-    }
 
 
     const handleLstmLoad = () => {
@@ -419,27 +299,14 @@ export default function analyzeVideo() {
         // 独自のLSTMモデル用意する際のコード
         const lstmModel = createLSTMModel(inputSize, featureSize, outputSize, lstmUnits);
         setLstmModel(lstmModel)
-
-        const learningRate = 0.001;
-        const optimizer = tf.train.adam(learningRate);
-        lstmModel.compile({
-            optimizer: optimizer,
-            loss:
-                'categoricalCrossentropy' //多クラス分類のための損失関数 ※ワンホットエンコーディング必須
-            // 'sparseCategoricalCrossentropy' //多クラス分類のための損失関数
-            // 'binaryCrossentropy' //二値分類のための損失関数
-            ,
-            metrics: ['accuracy']
-        });
-
-
         console.log("モデルロード終わり")
     }
 
 
-    const handleMemory = () => {
-        // console.log(tf.memory())
-        console.log(boxerKeypoint)
+    const handleJabSet2 = () => {
+        jabKeypoint2.length = 0
+        boxerKeypoint.map((kp: any) => { jabKeypoint2.push(kp) })
+        console.log(jabKeypoint2)
     }
 
     const handleSet = () => {
@@ -459,7 +326,7 @@ export default function analyzeVideo() {
         if (lstmModel && yTrain) {
             const xTrain = tf.tensor3d([noneJabKeypoint, jabKeypoint], [numSamples, inputSize, featureSize]);
             console.log("学習開始")
-            lstmModel.fit(xTrain, yTrain, { epochs: 20, batchSize: 50 }); // batchSizeを1に変更
+            lstmModel.fit(xTrain, yTrain, { epochs: 20, batchSize: 50 });
             console.log("学習終了")
         } else {
             console.log("学習")
@@ -537,9 +404,9 @@ export default function analyzeVideo() {
             <Form />
             <button onClick={handleModelLoad}>分析モデルをロードする</button>
             <button onClick={handleLstmLoad}>LSTMモデルロードボタン</button>
-            <button onClick={handleMemory}>メモリを調べる</button>
             <button onClick={handleSet}>通常時に設定</button>
             <button onClick={handleJabSet}>ジャブに設定</button>
+            <button onClick={handleJabSet2}>ジャブ2に設定</button>
             <button onClick={handleLearn}>学習</button>
             <button onClick={handleAddAnalyze}>分析処理追加</button>
             <button onClick={handlePixel}>ビクセル100プラス</button>
