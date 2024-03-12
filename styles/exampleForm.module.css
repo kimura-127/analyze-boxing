@@ -1,0 +1,21 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    margin: auto 0;
+}
+
+.topForm {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.form {
+    text-align: center;
+}
+
+.underForm {
+    display: flex;
+    flex-direction: column;
+    width: 85%;
+    margin: 10px auto;
+}

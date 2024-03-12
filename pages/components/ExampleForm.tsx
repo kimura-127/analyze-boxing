@@ -5,6 +5,7 @@ import { myselfState } from "@/atoms/myselfState";
 import { opponentState } from "@/atoms/opponentState";
 import { hitJudgmentState } from "@/atoms/hitJudgmentState";
 import { addExampleIndexState } from "@/atoms/addExampleIndexState";
+import styles from "../../styles/exampleForm.module.css"
 
 const ExampleForm = () => {
     const { register, handleSubmit } = useForm();
@@ -35,17 +36,19 @@ const ExampleForm = () => {
 
     return (
         <>
-            <form onSubmit={handleSubmit(addExample)} encType="multipart/form-data">
-                <select {...register("select1", { required: true })} style={{ width: "100px" }} >
-                    <option value="myself">自分</option>
-                    <option value="opponent">相手</option>
-                    <option value="other">その他</option>
-                </select>
-                <select {...register("select2", { required: true })} style={{ width: "100px" }}>
-                    <option value="myself">自分</option>
-                    <option value="opponent">相手</option>
-                    <option value="other">その他</option>
-                </select>
+            <form className={styles.container} onSubmit={handleSubmit(addExample)} encType="multipart/form-data">
+                <div className={styles.topForm}>
+                    <select {...register("select1", { required: true })} className={styles.form} style={{ width: "100px" }} >
+                        <option value="myself">自分</option>
+                        <option value="opponent">相手</option>
+                        <option value="other">その他</option>
+                    </select>
+                    <select {...register("select2", { required: true })} className={styles.form} style={{ width: "100px" }}>
+                        <option value="myself">自分</option>
+                        <option value="opponent">相手</option>
+                        <option value="other">その他</option>
+                    </select>
+                </div>
                 {/* <select {...register("select3", { required: true })} style={{ width: "100px" }}>
                     <option value="myself">自分</option>
                     <option value="opponent">相手</option>
@@ -56,11 +59,13 @@ const ExampleForm = () => {
                     <option value="opponent">相手</option>
                     <option value="other">その他</option>
                 </select> */}
-                <select {...register("select3", { required: true })} style={{ width: "100px" }}>
-                    <option value="hitJudgment">被弾判定</option>
-                    <option value="impactJudgment">着弾判定</option>
-                </select>
-                <button type='submit'>更新</button>
+                <div className={styles.underForm}>
+                    <select {...register("select3", { required: true })} className={styles.form}>
+                        <option value="hitJudgment">被弾判定</option>
+                        <option value="impactJudgment">着弾判定</option>
+                    </select>
+                    <button type='submit'>更新</button>
+                </div>
             </form>
         </>
     )

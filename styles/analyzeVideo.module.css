@@ -1,0 +1,77 @@
+.container {
+    height: 85vh;
+    width: 90%;
+    margin: 0 auto;
+    background-color: rgba(28, 28, 28, 0.706);
+    border-radius: 15px;
+    /* border: 2px solid rgba(0, 255, 255, 0.569); */
+}
+
+
+.analyzeContainer {
+    position: relative;
+    top: 25px;
+    left: 25px;
+}
+
+.video {
+    position: absolute;
+    width: 700px;
+    height: 400px;
+    border-radius: 10px;
+}
+
+.canvas {
+    position: absolute;
+    width: 700px;
+    height: 400px;
+    border-radius: 10px;
+    pointer-events: none;
+}
+
+.spaceContainer {
+    display: flex;
+}
+
+.space {
+    display: flex;
+    flex-direction: column;
+    height: 80svh;
+    width: 63vw;
+}
+
+.indexSpace {
+    height: 63vh;
+}
+
+.form {
+    margin: auto 0;
+}
+
+.canvasContainer {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    top: 60px;
+    height: 50vh;
+    width: 20vw;
+    border: 3px solid rgb(255, 255, 255);
+    border-radius: 15px;
+    background-color: rgba(74, 74, 74, 0.321);
+}
+
+.subCanvas {
+    background-color: rgba(0, 0, 0, 0.605);
+    height: 240px;
+    width: 100px;
+    border-radius: 10px;
+    border: 3px solid rgb(255, 255, 255);
+}
+
+.subCanvasContainer {
+    display: flex;
+    justify-content: space-evenly;
+    position: relative;
+    top: 1.5vh;
+    height: 37vh;
+}
