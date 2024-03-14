@@ -7,7 +7,7 @@ import { hitJudgmentState } from "@/atoms/hitJudgmentState";
 import { addExampleIndexState } from "@/atoms/addExampleIndexState";
 import styles from "../../styles/exampleForm.module.css"
 
-const ExampleForm = () => {
+const ExampleForm = ({ addExample }: { addExample: (data: any) => void }) => {
     const { register, handleSubmit } = useForm();
     const [myself, setMyself] = useRecoilState(myselfState)
     const [opponent, setOpponent] = useRecoilState(opponentState)
@@ -16,23 +16,23 @@ const ExampleForm = () => {
 
 
 
-    const addExample = (data: any) => {
-        console.log(data)
-        setAddExampleIndex(addExampleIndex + 1)
-        Object.entries(data).map(([key, value]) => {
-            switch (value) {
-                case "myself":
-                    setMyself(key)
-                    break;
-                case "opponent":
-                    setOpponent(key)
-                    break;
-                case "impactJudgment":
-                    setHitJudgment(false)
-                    break;
-            }
-        });
-    }
+    // const addExample = (data: any) => {
+    //     console.log(data)
+    //     setAddExampleIndex(addExampleIndex + 1)
+    //     Object.entries(data).map(([key, value]) => {
+    //         switch (value) {
+    //             case "myself":
+    //                 setMyself(key)
+    //                 break;
+    //             case "opponent":
+    //                 setOpponent(key)
+    //                 break;
+    //             case "impactJudgment":
+    //                 setHitJudgment(false)
+    //                 break;
+    //         }
+    //     });
+    // }
 
     return (
         <>
