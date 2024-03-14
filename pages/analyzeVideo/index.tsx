@@ -377,6 +377,24 @@ export default function analyzeVideo() {
         console.log(tf.memory())
     }
 
+    const addExample = (data: any) => {
+        console.log(data)
+        setAddExampleIndex(addExampleIndex + 1)
+        Object.entries(data).map(([key, value]) => {
+            switch (value) {
+                case "myself":
+                    setMyself(key)
+                    break;
+                case "opponent":
+                    setOpponent(key)
+                    break;
+                case "impactJudgment":
+                    setHitJudgment(false)
+                    break;
+            }
+        });
+    }
+
 
     return (
         <div className={styles.container}>
@@ -420,7 +438,7 @@ export default function analyzeVideo() {
                         <canvas ref={canvasRef1} className={styles.subCanvas} />
                         <canvas ref={canvasRef2} className={styles.subCanvas} />
                     </div>
-                    <ExampleForm />
+                    <ExampleForm addExample={addExample} />
                 </div>
             </div>
             {/* <canvas ref={canvasRef3} style={{ width: "100px", height: "100px" }} /> */}
