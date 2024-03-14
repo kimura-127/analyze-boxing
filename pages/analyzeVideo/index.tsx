@@ -34,7 +34,6 @@ export default function analyzeVideo() {
     const canvasRef4 = useRef<HTMLCanvasElement>(null);
     const [myself, setMyself] = useRecoilState(myselfState)
     const [opponent, setOpponent] = useRecoilState(opponentState)
-    const [addExampleIndex, setAddExampleIndex] = useRecoilState(addExampleIndexState)
     const [hitJudgment, setHitJudgment] = useRecoilState(hitJudgmentState)
     const [mobileNetModel, setMobileNetModel] = useState<mobilenet.MobileNet | null>(null)
     const [moveNetModel, setMoveNetModel] = useState<poseDetection.PoseDetector | null>(null)
@@ -53,10 +52,15 @@ export default function analyzeVideo() {
     const jabKeypoint2: any = []
     const noneJabKeypoint: any = []
     const handleAnalyze = useRef(false)
+    const otherPeople = useRef(false)
     const yPixelSize = useRef(300)
     const handlePlayIndex = useRef(0)
     const moveNetPoses = useRef<poseDetection.Pose[]>()
-    const nextAddExampleTime = 1
+    const myselfRefArray = useRef([])
+    const opponentRefArray = useRef([])
+    const addExampletimes = 5
+    const analyzeHeadCount = 2
+    const nextAddExampleclock = 3
 
 
 
@@ -73,12 +77,13 @@ export default function analyzeVideo() {
         setExample2Ctx(example2Ctx)
 
 
-        if (moveNetModel && videoElement && handlePlayIndex.current < 2) {
+        if (moveNetModel && videoElement && handlePlayIndex.current < addExampletimes) {
 
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
+                console.log(poses)
                 moveNetPoses.current = poses
-                if (poses.length > 1) {
+                if (poses.length >= analyzeHeadCount) {
                     videoElement?.pause()
                     handlePlayIndex.current++
                     console.log(handlePlayIndex.current)
@@ -88,7 +93,7 @@ export default function analyzeVideo() {
                 }
                 setTimeout(() => { videoElement?.paused || requestAnimationFrame(animate) }, 3000)
             }
-            setTimeout(() => { requestAnimationFrame(animate) }, nextAddExampleTime * 1000)
+            setTimeout(() => { requestAnimationFrame(animate) }, nextAddExampleclock * 1000)
         } else if (moveNetModel && videoElement) {
             const animate = async () => {
 
@@ -146,91 +151,6 @@ export default function analyzeVideo() {
 
 
 
-    useEffect(() => {
-        if (addExampleIndex > 0 && videoRef.current) {
-            videoRef.current.style.pointerEvents = 'auto'
-            const croppedImageData = croppedImage(videoRef.current, moveNetPoses.current, yPixelSize.current)
-            switch (myself) {
-                case "select1":
-                    console.log("select1")
-                    if (mobileNetModel && canvasRef1.current) {
-                        const activation = (mobileNetModel as any).infer(croppedImageData[0], 'conv_preds')
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        activation.dispose()
-                    }
-                    break;
-                case "select2":
-                    console.log("select2")
-                    if (mobileNetModel && canvasRef2.current) {
-                        const activation = (mobileNetModel as any).infer(croppedImageData[1], 'conv_preds')
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        classifier.addExample(activation, "myself")
-                        activation.dispose()
-                    }
-                    break;
-                // case "select3":
-                //     console.log("select3")
-                //     break;
-                // case "select4":
-                //     console.log("select4")
-                //     break;
-            }
-            switch (opponent) {
-                case "select1":
-                    console.log("select1")
-                    if (mobileNetModel && canvasRef1.current) {
-                        const activation = (mobileNetModel as any).infer(croppedImageData[0], 'conv_preds')
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        activation.dispose()
-                    }
-                    break;
-                case "select2":
-                    console.log("select2")
-                    if (mobileNetModel && canvasRef2.current) {
-                        const activation = (mobileNetModel as any).infer(croppedImageData[1], 'conv_preds')
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        classifier.addExample(activation, "opponent")
-                        activation.dispose()
-                    }
-                    break;
-                // case "select3":
-                //     console.log("select3")
-                //     break;
-                // case "select4":
-                //     console.log("select4")
-                //     break;
-            }
-
-
-            croppedImageData.forEach((croppedImage: any) => {
-                croppedImage.dispose()
-            });
-        }
-    }, [addExampleIndex])
-
-
     const handleModelLoad = () => {
         const modelLoad = async () => {
             console.log("モデルロード開始")
@@ -265,6 +185,8 @@ export default function analyzeVideo() {
             setCtx(ctx)
             videoElement.width = videoElement.videoWidth;
             videoElement.height = videoElement.videoHeight;
+        } else {
+            console.log("むり")
         }
     }
 
@@ -377,22 +299,62 @@ export default function analyzeVideo() {
         console.log(tf.memory())
     }
 
-    const addExample = (data: any) => {
+
+    const addCroppImageArray = (data: any) => {
+        const croppedImageData = croppedImage(videoRef.current, moveNetPoses.current, yPixelSize.current)
+        otherPeople.current = false
+        const addArray = (key: any, array: any) => {
+            if (key === "select1") {
+                array.current.push(croppedImageData[0])
+            } else if (key === "select2") {
+                array.current.push(croppedImageData[1])
+            }
+        }
         console.log(data)
-        setAddExampleIndex(addExampleIndex + 1)
         Object.entries(data).map(([key, value]) => {
             switch (value) {
                 case "myself":
-                    setMyself(key)
+                    addArray(key, myselfRefArray)
+                    console.log(myselfRefArray.current)
                     break;
                 case "opponent":
-                    setOpponent(key)
+                    addArray(key, opponentRefArray)
+                    console.log(opponentRefArray.current)
+                    break;
+                case "other":
+                    otherPeople.current = true
                     break;
                 case "impactJudgment":
                     setHitJudgment(false)
                     break;
             }
         });
+        console.log(handlePlayIndex.current, addExampletimes, videoRef.current)
+        otherPeople.current && handlePlayIndex.current--
+        if (handlePlayIndex.current === addExampletimes && videoRef.current) {
+            const addExample = (personRefArray: any, personName: string) => {
+                personRefArray.forEach((croppedImageTensor: any) => {
+                    const activation = (mobileNetModel as any).infer(croppedImageTensor, 'conv_preds')
+                    classifier.addExample(activation, personName)
+                    classifier.addExample(activation, personName)
+                    classifier.addExample(activation, personName)
+                    classifier.addExample(activation, personName)
+                    classifier.addExample(activation, personName)
+                    classifier.addExample(activation, personName)
+                    classifier.addExample(activation, personName)
+                    classifier.addExample(activation, personName)
+                    classifier.addExample(activation, personName)
+                    classifier.addExample(activation, personName)
+                });
+            }
+            addExample(myselfRefArray.current, "myself")
+            addExample(opponentRefArray.current, "opponent")
+            videoRef.current.style.pointerEvents = 'auto'
+            console.log("学習しました")
+        } else if (videoRef.current) {
+            videoRef.current.style.pointerEvents = 'auto'
+            console.log("人物の特徴量を収集OK")
+        }
     }
 
 
@@ -438,7 +400,7 @@ export default function analyzeVideo() {
                         <canvas ref={canvasRef1} className={styles.subCanvas} />
                         <canvas ref={canvasRef2} className={styles.subCanvas} />
                     </div>
-                    <ExampleForm addExample={addExample} />
+                    <ExampleForm addCroppImageArray={addCroppImageArray} />
                 </div>
             </div>
             {/* <canvas ref={canvasRef3} style={{ width: "100px", height: "100px" }} /> */}
