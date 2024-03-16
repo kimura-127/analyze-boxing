@@ -34,6 +34,7 @@ export default function analyzeVideo() {
     const canvasRef4 = useRef<HTMLCanvasElement>(null);
     const [myself, setMyself] = useRecoilState(myselfState)
     const [opponent, setOpponent] = useRecoilState(opponentState)
+    const [addExampleIndex, setAddExampleIndex] = useRecoilState(addExampleIndexState)
     const [hitJudgment, setHitJudgment] = useRecoilState(hitJudgmentState)
     const [mobileNetModel, setMobileNetModel] = useState<mobilenet.MobileNet | null>(null)
     const [moveNetModel, setMoveNetModel] = useState<poseDetection.PoseDetector | null>(null)
@@ -52,15 +53,15 @@ export default function analyzeVideo() {
     const jabKeypoint2: any = []
     const noneJabKeypoint: any = []
     const handleAnalyze = useRef(false)
-    const otherPeople = useRef(false)
     const yPixelSize = useRef(300)
     const handlePlayIndex = useRef(0)
     const moveNetPoses = useRef<poseDetection.Pose[]>()
+    const nextAddExampleTime = 3
+    const addExampletimes = 4
     const myselfRefArray = useRef([])
     const opponentRefArray = useRef([])
-    const addExampletimes = 5
-    const analyzeHeadCount = 2
-    const nextAddExampleclock = 3
+    let frameCount = 0;
+    const frameInterval = 100;
 
 
 
@@ -82,23 +83,27 @@ export default function analyzeVideo() {
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
                 console.log(poses)
-                moveNetPoses.current = poses
-                if (poses.length >= analyzeHeadCount) {
+                if (poses.length > 1) {
                     videoElement?.pause()
                     handlePlayIndex.current++
                     console.log(handlePlayIndex.current)
                     videoElement.style.pointerEvents = 'none';
                     drawExample(videoElement, poses[0], example1Ctx)
                     drawExample(videoElement, poses[1], example2Ctx)
+                    moveNetPoses.current = poses
                 }
-                setTimeout(() => { videoElement?.paused || requestAnimationFrame(animate) }, 3000)
+                setTimeout(() => {
+                    videoElement?.paused || requestAnimationFrame(animate)
+                }, nextAddExampleTime * 1000)
             }
-            setTimeout(() => { requestAnimationFrame(animate) }, nextAddExampleclock * 1000)
+            setTimeout(() => {
+                requestAnimationFrame(animate)
+            }, nextAddExampleTime * 1000)
         } else if (moveNetModel && videoElement) {
             const animate = async () => {
 
                 const poses = await moveNetModel.estimatePoses(videoElement);
-                const croppedImageData = await croppedImage(videoElement, poses, yPixelSize.current)
+                const croppedImageData = croppedImage(videoElement, poses, yPixelSize.current)
 
 
                 if (poses.length > 0 && mobileNetModel && blazePoseModel) {
@@ -185,8 +190,6 @@ export default function analyzeVideo() {
             setCtx(ctx)
             videoElement.width = videoElement.videoWidth;
             videoElement.height = videoElement.videoHeight;
-        } else {
-            console.log("むり")
         }
     }
 
@@ -297,17 +300,19 @@ export default function analyzeVideo() {
         // console.log(rotatedVector);
 
         console.log(tf.memory())
+        console.log(moveNetPoses.current)
     }
 
-
     const addCroppImageArray = (data: any) => {
-        const croppedImageData = croppedImage(videoRef.current, moveNetPoses.current, yPixelSize.current)
-        otherPeople.current = false
         const addArray = (key: any, array: any) => {
             if (key === "select1") {
-                array.current.push(croppedImageData[0])
+                const videoTensor = tf.browser.fromPixels(canvasRef1.current as HTMLCanvasElement);
+                console.log(videoTensor)
+                array.current.push(videoTensor)
             } else if (key === "select2") {
-                array.current.push(croppedImageData[1])
+                const videoTensor = tf.browser.fromPixels(canvasRef2.current as HTMLCanvasElement);
+                array.current.push(videoTensor)
+                console.log(videoTensor)
             }
         }
         console.log(data)
@@ -316,21 +321,22 @@ export default function analyzeVideo() {
                 case "myself":
                     addArray(key, myselfRefArray)
                     console.log(myselfRefArray.current)
+                    // console.log("my")
                     break;
                 case "opponent":
                     addArray(key, opponentRefArray)
                     console.log(opponentRefArray.current)
+                    // console.log("oppo")
                     break;
-                case "other":
-                    otherPeople.current = true
-                    break;
+                // case "other":
+                //     otherPeople.current = true
+                //     break;
                 case "impactJudgment":
                     setHitJudgment(false)
                     break;
             }
-        });
-        console.log(handlePlayIndex.current, addExampletimes, videoRef.current)
-        otherPeople.current && handlePlayIndex.current--
+        })
+        // otherPeople.current && handlePlayIndex.current--
         if (handlePlayIndex.current === addExampletimes && videoRef.current) {
             const addExample = (personRefArray: any, personName: string) => {
                 personRefArray.forEach((croppedImageTensor: any) => {
@@ -356,7 +362,6 @@ export default function analyzeVideo() {
             console.log("人物の特徴量を収集OK")
         }
     }
-
 
     return (
         <div className={styles.container}>
