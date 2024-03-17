@@ -18,7 +18,9 @@ const Header = () => {
                     <Link href="/analyzeVideo">
                         <li className={styles.navItem}>分析画面</li>
                     </Link>
-                    <li className={styles.navItem}>お問い合わせ</li>
+                    <Link href="/ContactForm">
+                        <li className={styles.navItem}>お問い合わせ</li>
+                    </Link>
                 </ul>
             </nav>
         </header>

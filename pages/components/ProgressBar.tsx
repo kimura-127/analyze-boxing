@@ -1,9 +1,8 @@
-// components/ProgressBar.tsx
 import React, { FC } from 'react';
 import styles from '../../styles/progressBar.module.css';
 
 interface ProgressBarProps {
-    progress: number; // 0 から 100 の値
+    progress: number;
 }
 
 const ProgressBar: FC<ProgressBarProps> = ({ progress }) => {
