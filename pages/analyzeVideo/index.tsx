@@ -9,15 +9,12 @@ import * as tf from '@tensorflow/tfjs';
 import { useRecoilState } from "recoil";
 import { videoSrcState } from "@/atoms/videoSrcState";
 import { drawSkeleton } from "@/utils/drawSkeleton";
-import { myselfState } from "@/atoms/myselfState";
-import { opponentState } from "@/atoms/opponentState";
 import ExampleForm from "../components/ExampleForm";
 import { drawExample } from "@/utils/drawExample";
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
 import { croppedImage } from "@/utils/croppedImage";
 import { knnClassifierPredict } from "@/utils/knnClassifierPredict";
 import { hitJudgmentState } from "@/atoms/hitJudgmentState";
-import { addExampleIndexState } from "@/atoms/addExampleIndexState";
 import { createLSTMModel } from "@/utils/createLSTMModel";
 import styles from "../../styles/analyzeVideo.module.css"
 import { drawKeypoint } from "@/utils/drawKeypoint";
