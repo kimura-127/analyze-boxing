@@ -1,0 +1,30 @@
+/* styles/TermsOfService.module.css */
+.termsContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: rgba(28, 28, 28, 0.706);
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.termsTitle {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.termsSection {
+  margin-bottom: 20px;
+}
+
+.termsHeading {
+  font-weight: bold;
+  margin-top: 20px;
+  color: #ffffff;
+}
+
+.effectiveDate {
+  text-align: right;
+  font-style: italic;
+  margin-top: 40px;
+}

@@ -30,8 +30,8 @@ const Home = () => {
       </div>
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
-          <a href="/terms" className={styles.footerLink}>利用規約</a>
-          <a href="/privacy" className={styles.footerLink}>プライバシーポリシー</a>
+          <a href="/termsOfService" className={styles.footerLink}>利用規約</a>
+          <a href="/privacyPolicy" className={styles.footerLink}>プライバシーポリシー</a>
         </div>
         <p>Copyright © 2024 - All right reserved by AnalyzeBoxing</p>
       </footer>
