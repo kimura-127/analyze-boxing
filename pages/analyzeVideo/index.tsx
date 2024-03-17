@@ -20,6 +20,7 @@ import { hitJudgmentState } from "@/atoms/hitJudgmentState";
 import { addExampleIndexState } from "@/atoms/addExampleIndexState";
 import { createLSTMModel } from "@/utils/createLSTMModel";
 import styles from "../../styles/analyzeVideo.module.css"
+import { drawKeypoint } from "@/utils/drawKeypoint";
 
 
 
@@ -47,16 +48,14 @@ export default function analyzeVideo() {
     const noneJabKeypoint: any = []
     const handleAnalyze = useRef(false)
     const otherPeople = useRef(false)
-    const yPixelSize = useRef(300)
+    const yPixelSize = useRef(800)
     const handlePlayIndex = useRef(0)
     const moveNetPoses = useRef<poseDetection.Pose[]>()
-    const nextAddExampleTime = 3
+    const nextAddClock = 4
     const addExampletimes = 4
+    const personLength = 2
     const myselfRefArray = useRef([])
     const opponentRefArray = useRef([])
-
-
-
 
 
 
@@ -74,22 +73,24 @@ export default function analyzeVideo() {
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
                 console.log(poses)
-                if (poses.length > 1) {
+                if (poses.length >= personLength) {
                     videoElement?.pause()
                     handlePlayIndex.current++
                     console.log(handlePlayIndex.current)
                     videoElement.style.pointerEvents = 'none';
+                    drawKeypoint(ctx, videoElement, poses[0])
+                    drawKeypoint(ctx, videoElement, poses[1])
                     drawExample(videoElement, poses[0], example1Ctx)
                     drawExample(videoElement, poses[1], example2Ctx)
                     moveNetPoses.current = poses
                 }
                 setTimeout(() => {
                     videoElement?.paused || requestAnimationFrame(animate)
-                }, nextAddExampleTime * 1000)
+                }, nextAddClock * 1000)
             }
             setTimeout(() => {
                 requestAnimationFrame(animate)
-            }, nextAddExampleTime * 1000)
+            }, nextAddClock * 1000)
         } else if (moveNetModel && videoElement) {
             const animate = async () => {
 
@@ -105,15 +106,8 @@ export default function analyzeVideo() {
                                 if (result && result.length > 0) {
                                     canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
                                     drawSkeleton(ctx, videoElement, result[0].keypoints, poses[index], yPixelSize.current)
-                                    // result[0].keypoints.forEach((kp: any) => {
-                                    //     array.push(kp.x, kp.y, kp.z, kp.score);
-                                    // });
-
-                                    // array.push(result[0].keypoints[13].x, result[0].keypoints[13].y, result[0].keypoints[13].z, result[0].keypoints[13].score);
-                                    // array.push(result[0].keypoints[15].x, result[0].keypoints[15].y, result[0].keypoints[15].z, result[0].keypoints[15].score);
-                                    array.push(result[0].keypoints[11].y - result[0].keypoints[13].y);
+                                    array.push(result[0].keypoints[13].y - result[0].keypoints[11].y);
                                     boxerKeypoint.push(array);
-                                    console.log(result)
                                     croppedImage.dispose()
                                 }
                                 while (boxerKeypoint.length > inputSize) {
@@ -184,7 +178,7 @@ export default function analyzeVideo() {
         }
     }
 
-    const inputSize = 40; // シーケンス長 []の数
+    const inputSize = 10; // シーケンス長 []の数
     const featureSize = 1; // サンプル内の特徴量の数
     const outputSize = 2; // 出力の次元数,numSamplesと同じ値にすること
     const lstmUnits = 50;   // LSTMユニットの数
@@ -261,37 +255,20 @@ export default function analyzeVideo() {
     }
 
     const handlePixel = () => {
-        yPixelSize.current += 100
-        console.log(yPixelSize.current)
+        // yPixelSize.current += 100
+        // console.log(yPixelSize.current)
     }
 
     const handleSaveModel = () => {
-        // const saveModel = async () => {
-        //     if (lstmModel) {
-        //         await lstmModel.save('downloads://lstm-model');
-        //     }
-        // }
-        // saveModel()
+        const saveModel = async () => {
+            if (lstmModel) {
+                await lstmModel.save('downloads://lstm-model');
+            }
+        }
+        saveModel()
 
-        // const rotateY = (vector: any, angle: any) => {
-        //     const rad = angle * Math.PI / 180; // 角度をラジアンに変換
-        //     const cos = Math.cos(rad);
-        //     const sin = Math.sin(rad);
-
-        //     return {
-        //         x: vector.x * cos + vector.z * sin,
-        //         y: vector.y,
-        //         z: -vector.x * sin + vector.z * cos
-        //     };
-        // }
-
-        // // 例: Y軸周りに45度回転
-        // const originalVector = { x: 10, y: 10, z: 10 };
-        // const rotatedVector = rotateY(originalVector, 360);
-        // console.log(rotatedVector);
-
-        console.log(tf.memory())
-        console.log(moveNetPoses.current)
+        // yPixelSize.current -= 100
+        // console.log(yPixelSize.current)
     }
 
     const addCroppImageArray = (data: any) => {
@@ -307,6 +284,7 @@ export default function analyzeVideo() {
             }
         }
         otherPeople.current = false
+        ctx?.clearRect(0, 0, canvasRef.current?.width as number, canvasRef.current?.height as number)
         Object.entries(data).map(([key, value]) => {
             switch (value) {
                 case "myself":
@@ -326,7 +304,7 @@ export default function analyzeVideo() {
             }
         })
         otherPeople.current && handlePlayIndex.current--
-        if (handlePlayIndex.current === addExampletimes && videoRef.current) {
+        if (handlePlayIndex.current === addExampletimes) {
             const addExample = (personRefArray: any, personName: string) => {
                 personRefArray.forEach((croppedImageTensor: any) => {
                     const learningIndex = 5
@@ -334,15 +312,24 @@ export default function analyzeVideo() {
                     for (let index = 0; index < learningIndex; index++) {
                         classifier.addExample(activation, personName)
                     }
+                    activation.dispose()
                 });
             }
             addExample(myselfRefArray.current, "myself")
             addExample(opponentRefArray.current, "opponent")
-            videoRef.current.style.pointerEvents = 'auto'
             console.log("学習しました")
+            setTimeout(() => {
+                if (videoRef.current) {
+                    videoRef.current.style.pointerEvents = 'auto'
+                }
+            }, 1000)
         } else if (videoRef.current) {
-            videoRef.current.style.pointerEvents = 'auto'
             console.log("人物の特徴量を収集OK")
+            setTimeout(() => {
+                if (videoRef.current) {
+                    videoRef.current.style.pointerEvents = 'auto'
+                }
+            }, 1000)
         }
     }
 
