@@ -30,18 +30,11 @@ export default function analyzeVideo() {
     const [videoSrc, _] = useRecoilState(videoSrcState)
     const canvasRef1 = useRef<HTMLCanvasElement>(null);
     const canvasRef2 = useRef<HTMLCanvasElement>(null);
-    const canvasRef3 = useRef<HTMLCanvasElement>(null);
-    const canvasRef4 = useRef<HTMLCanvasElement>(null);
-    const [myself, setMyself] = useRecoilState(myselfState)
-    const [opponent, setOpponent] = useRecoilState(opponentState)
-    const [addExampleIndex, setAddExampleIndex] = useRecoilState(addExampleIndexState)
     const [hitJudgment, setHitJudgment] = useRecoilState(hitJudgmentState)
     const [mobileNetModel, setMobileNetModel] = useState<mobilenet.MobileNet | null>(null)
     const [moveNetModel, setMoveNetModel] = useState<poseDetection.PoseDetector | null>(null)
     const [blazePoseModel, setBlazePoseModel] = useState<poseDetection.PoseDetector>()
     const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null)
-    const [example1Ctx, setExample1Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
-    const [example2Ctx, setExample2Ctx] = useState<CanvasRenderingContext2D | null | undefined>()
     const classifier = knnClassifier.create();
     const [lstmModel, setLstmModel] = useState<any>()
     const [xTrain, setXTrain] = useState<tf.Tensor3D>()
@@ -53,6 +46,7 @@ export default function analyzeVideo() {
     const jabKeypoint2: any = []
     const noneJabKeypoint: any = []
     const handleAnalyze = useRef(false)
+    const otherPeople = useRef(false)
     const yPixelSize = useRef(300)
     const handlePlayIndex = useRef(0)
     const moveNetPoses = useRef<poseDetection.Pose[]>()
@@ -60,8 +54,8 @@ export default function analyzeVideo() {
     const addExampletimes = 4
     const myselfRefArray = useRef([])
     const opponentRefArray = useRef([])
-    let frameCount = 0;
-    const frameInterval = 100;
+
+
 
 
 
@@ -73,9 +67,6 @@ export default function analyzeVideo() {
         const example2CanvasElement = canvasRef2.current
         const example1Ctx = example1CanvasElement?.getContext('2d')
         const example2Ctx = example2CanvasElement?.getContext('2d')
-
-        setExample1Ctx(example1Ctx)
-        setExample2Ctx(example2Ctx)
 
 
         if (moveNetModel && videoElement && handlePlayIndex.current < addExampletimes) {
@@ -315,42 +306,34 @@ export default function analyzeVideo() {
                 console.log(videoTensor)
             }
         }
-        console.log(data)
+        otherPeople.current = false
         Object.entries(data).map(([key, value]) => {
             switch (value) {
                 case "myself":
                     addArray(key, myselfRefArray)
                     console.log(myselfRefArray.current)
-                    // console.log("my")
                     break;
                 case "opponent":
                     addArray(key, opponentRefArray)
                     console.log(opponentRefArray.current)
-                    // console.log("oppo")
                     break;
-                // case "other":
-                //     otherPeople.current = true
-                //     break;
+                case "other":
+                    otherPeople.current = true
+                    break;
                 case "impactJudgment":
                     setHitJudgment(false)
                     break;
             }
         })
-        // otherPeople.current && handlePlayIndex.current--
+        otherPeople.current && handlePlayIndex.current--
         if (handlePlayIndex.current === addExampletimes && videoRef.current) {
             const addExample = (personRefArray: any, personName: string) => {
                 personRefArray.forEach((croppedImageTensor: any) => {
+                    const learningIndex = 5
                     const activation = (mobileNetModel as any).infer(croppedImageTensor, 'conv_preds')
-                    classifier.addExample(activation, personName)
-                    classifier.addExample(activation, personName)
-                    classifier.addExample(activation, personName)
-                    classifier.addExample(activation, personName)
-                    classifier.addExample(activation, personName)
-                    classifier.addExample(activation, personName)
-                    classifier.addExample(activation, personName)
-                    classifier.addExample(activation, personName)
-                    classifier.addExample(activation, personName)
-                    classifier.addExample(activation, personName)
+                    for (let index = 0; index < learningIndex; index++) {
+                        classifier.addExample(activation, personName)
+                    }
                 });
             }
             addExample(myselfRefArray.current, "myself")
@@ -408,8 +391,6 @@ export default function analyzeVideo() {
                     <ExampleForm addCroppImageArray={addCroppImageArray} />
                 </div>
             </div>
-            {/* <canvas ref={canvasRef3} style={{ width: "100px", height: "100px" }} /> */}
-            {/* <canvas ref={canvasRef4} style={{ width: "100px", height: "100px" }} /> */}
         </div>
     )
 }
