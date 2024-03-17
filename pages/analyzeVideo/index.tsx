@@ -42,6 +42,7 @@ export default function analyzeVideo() {
     const [xTrain, setXTrain] = useState<tf.Tensor3D>()
     const [xPredict, setXPredict] = useState<tf.Tensor3D>()
     const [yTrain, setYTrain] = useState<tf.Tensor2D>()
+    const [overlayVisible, setOverlayVisible] = useState(true);
     const [xTestPredict, setXTestPredict] = useState<tf.Tensor3D>()
     const boxerKeypoint: any = []
     const jabKeypoint: any = []
@@ -190,6 +191,7 @@ export default function analyzeVideo() {
 
             const yTrain = tf.tensor2d([[1, 0], [0, 1]], [numSamples, outputSize]);
             setYTrain(yTrain)
+            setOverlayVisible(false);
             console.log("モデルロード完全終了")
         }
 
@@ -330,6 +332,12 @@ export default function analyzeVideo() {
 
     return (
         <div className={styles.container}>
+            {overlayVisible && (
+                <div className={styles.overlay}>
+                    <button onClick={handleModelLoad}>分析モデルをロードする</button>
+                </div>
+            )}
+
             <div className={styles.analyzeContainer}>
                 <video
                     ref={videoRef}
@@ -354,7 +362,6 @@ export default function analyzeVideo() {
                     <div className={styles.indexSpace} />
                     <div className={styles.form}>
                         <Form />
-                        <button onClick={handleModelLoad}>分析モデルをロードする</button>
                         {/* <button onClick={handleSet}>通常時に設定</button> */}
                         {/* <button onClick={handleJabSet}>ジャブに設定</button> */}
                         {/* <button onClick={handleJabSet2}>ジャブ2に設定</button> */}
