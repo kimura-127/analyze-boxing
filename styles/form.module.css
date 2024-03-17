@@ -1,0 +1,49 @@
+/* styles/Form.module.css */
+.formContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    /* フォーム要素間のスペース */
+    padding: 2rem;
+    border: 3px solid rgb(255, 255, 255);
+    border-radius: 15px;
+    background-color: rgba(74, 74, 74, 0.321);
+    height: 15vh;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.formContainer input[type="file"] {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px dashed #0070f3;
+    border-radius: 10px;
+    /* text-align: center; */
+    margin-top: 0 auto;
+    cursor: pointer;
+    color: black;
+    background-color: white;
+    transition: border-color 0.3s ease;
+}
+
+.formContainer input[type="file"]:hover {
+    border-color: #0056b3;
+}
+
+
+.formContainer button {
+    padding: 1rem 3rem;
+    font-size: 16px;
+    background: #0070f3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.formContainer button:hover {
+    background-color: #0056b3;
+}

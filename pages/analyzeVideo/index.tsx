@@ -21,6 +21,7 @@ import { addExampleIndexState } from "@/atoms/addExampleIndexState";
 import { createLSTMModel } from "@/utils/createLSTMModel";
 import styles from "../../styles/analyzeVideo.module.css"
 import { drawKeypoint } from "@/utils/drawKeypoint";
+import ProgressBar from "../components/ProgressBar";
 
 
 
@@ -44,6 +45,7 @@ export default function analyzeVideo() {
     const [yTrain, setYTrain] = useState<tf.Tensor2D>()
     const [overlayVisible, setOverlayVisible] = useState(true);
     const [xTestPredict, setXTestPredict] = useState<tf.Tensor3D>()
+    const [handleProgress, setHandleProgress] = useState(0)
     const boxerKeypoint: any = []
     const jabKeypoint: any = []
     const jabKeypoint2: any = []
@@ -157,14 +159,18 @@ export default function analyzeVideo() {
     const handleModelLoad = () => {
         const modelLoad = async () => {
             console.log("モデルロード開始")
-            await tf.ready()
 
+            await tf.ready()
+            setHandleProgress(15)
             const moveNetModel = await moveNetModelLoad()
             setMoveNetModel(moveNetModel)
+            setHandleProgress(55)
             const mobileNetModel = await mobilenet.load()
             setMobileNetModel(mobileNetModel)
+            setHandleProgress(75)
             const blazePoseModel = await blazePoseModelLoad()
             setBlazePoseModel(blazePoseModel)
+            setHandleProgress(90)
 
             // 既存のLSTMモデルを使用する際のコード
             const lstmModel = async () => {
@@ -184,6 +190,7 @@ export default function analyzeVideo() {
                 setLstmModel(model)
             }
             lstmModel()
+            setHandleProgress(100)
 
             // 独自のLSTMモデル用意する際のコード
             // const lstmModel = createLSTMModel(inputSize, featureSize, outputSize, lstmUnits);
@@ -197,6 +204,7 @@ export default function analyzeVideo() {
 
 
         modelLoad()
+
 
         const videoElement = videoRef.current
         const canvasElement = canvasRef.current
@@ -334,10 +342,12 @@ export default function analyzeVideo() {
         <div className={styles.container}>
             {overlayVisible && (
                 <div className={styles.overlay}>
+                    {handleProgress === 100 || (
+                        <ProgressBar progress={handleProgress} />
+                    )}
                     <button onClick={handleModelLoad}>分析モデルをロードする</button>
                 </div>
             )}
-
             <div className={styles.analyzeContainer}>
                 <video
                     ref={videoRef}

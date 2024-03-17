@@ -35,7 +35,7 @@ const ExampleForm = ({ addCroppImageArray }: { addCroppImageArray: (data: any) =
                         <option value="hitJudgment">被弾判定</option>
                         <option value="impactJudgment">着弾判定</option>
                     </select>
-                    <button type='submit'>更新</button>
+                    <button type='submit'>学習</button>
                 </div>
             </form>
         </>

@@ -52,8 +52,8 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    top: 60px;
-    height: 75vh;
+    top: 3vh;
+    height: 80vh;
     width: 20vw;
     border: 3px solid rgb(255, 255, 255);
     border-radius: 15px;
@@ -94,6 +94,8 @@
     padding: 8px;
     border: 1px solid #ddd;
     text-align: center;
+    font-weight: bold;
+    font-size: 1rem;
 }
 
 .clickTable th {
@@ -107,10 +109,11 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.8);
     /* 半透明のグレー */
     display: flex;
     justify-content: center;
+    flex-direction: column;
     /* 中央揃え */
     align-items: center;
     /* 中央揃え */
@@ -129,6 +132,7 @@
     cursor: pointer;
     text-decoration: none;
     transition: background-color 0.3s ease;
+    font-weight: bold;
 }
 
 .overlay button:hover {
