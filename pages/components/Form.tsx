@@ -2,6 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { useRecoilState } from "recoil";
 import { videoSrcState } from "@/atoms/videoSrcState";
+import styles from "../../styles/form.module.css"
 
 const Form = () => {
     const [videoSrc, setVideoSrc] = useRecoilState(videoSrcState)
@@ -18,9 +19,9 @@ const Form = () => {
         }
     }
     return (
-        <form onSubmit={handleSubmit(tfReady)} encType="multipart/form-data">
+        <form className={styles.formContainer} onSubmit={handleSubmit(tfReady)} encType="multipart/form-data">
             <input type="file" {...register("video")} />
-            <button type='submit'>びでお</button>
+            <button type='submit'>動画を挿入</button>
         </form>
     )
 }

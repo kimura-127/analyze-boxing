@@ -1,0 +1,28 @@
+/* styles/ProgressBar.module.css */
+.progressBarContainer {
+    width: 80%;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    /* 子要素がボーダーをはみ出さないようにする */
+}
+
+.progressBar {
+    height: 20px;
+    background-color: #0070f3;
+    border-radius: 5px;
+    width: 0%;
+    /* 初期状態の幅 */
+    transition: width 0.4s ease;
+    /* position: relative; */
+}
+
+.progressBarText {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    /* テキストをバーの中央に配置 */
+    position: absolute;
+    /* コンテナ内でテキストを中央に配置するため */
+    width: 80%;
+}

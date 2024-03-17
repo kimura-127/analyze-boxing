@@ -11,15 +11,44 @@
 }
 
 .form {
-    font-size: 16px;
-    text-align: center;
+    padding: 0.5rem 1rem;
+    border: 2px solid #ccc;
+    /* グレーのボーダー */
+    border-radius: 15px;
+    background-color: #333;
+    /* 薄いグレーの背景 */
+    color: white;
+    /* 濃いグレーのテキスト */
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-appearance: none;
+    /* iOSのデフォルトスタイリングを無効にする */
+    -moz-appearance: none;
+    /* Firefoxのデフォルトスタイリングを無効にする */
+    appearance: none;
+    /* 標準のドロップダウンアイコンを消去 */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill="%23cccccc" d="M5 8l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1.25rem;
+
+}
+
+.form option {
+    background: #f0f0f0;
+    /* 同じく薄いグレーの背景 */
+    color: #333;
+    /* オプションのテキスト色を濃いグレーにする */
 }
 
 .underForm {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     width: 85%;
-    margin: 10px auto;
+    height: 10vh;
+    margin: 5px auto;
 }
 
 .underForm button {
@@ -31,6 +60,7 @@
     cursor: pointer;
     text-decoration: none;
     transition: background-color 0.3s ease;
+    font-weight: bold;
 }
 
 
