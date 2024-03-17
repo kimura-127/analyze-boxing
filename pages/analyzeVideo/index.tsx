@@ -24,6 +24,7 @@ import { drawKeypoint } from "@/utils/drawKeypoint";
 
 
 
+
 export default function analyzeVideo() {
 
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -46,16 +47,19 @@ export default function analyzeVideo() {
     const jabKeypoint: any = []
     const jabKeypoint2: any = []
     const noneJabKeypoint: any = []
-    const handleAnalyze = useRef(false)
+    const handleAnalyze = useRef(true)
     const otherPeople = useRef(false)
     const yPixelSize = useRef(800)
     const handlePlayIndex = useRef(0)
     const moveNetPoses = useRef<poseDetection.Pose[]>()
     const nextAddClock = 4
-    const addExampletimes = 4
+    const addExampletimes = 3
     const personLength = 2
+    const exampleTimeLag = 4
     const myselfRefArray = useRef([])
     const opponentRefArray = useRef([])
+    const [jabCount, setJabCount] = useState<number>(0)
+    const modelUrl = '/models/myLSTMModels/v2/lstm-model.json';
 
 
 
@@ -129,6 +133,9 @@ export default function analyzeVideo() {
                         const prediction: any = lstmModel.predict(xTrain);
                         prediction.array().then((array: any) => {
                             console.log(array[0][0].toFixed(1), array[0][1].toFixed(1));
+                            if (array[0][1].toFixed(1) > 0.5) {
+                                setJabCount(jabCount + 1)
+                            }
                         });
                     }
                 }
@@ -139,6 +146,11 @@ export default function analyzeVideo() {
 
     };
 
+    const inputSize = 10; // シーケンス長 []の数
+    const featureSize = 1; // サンプル内の特徴量の数
+    const outputSize = 2; // 出力の次元数,numSamplesと同じ値にすること
+    const lstmUnits = 50;   // LSTMユニットの数
+    const numSamples = 2; // サンプル数,データの総数のこと
 
 
     const handleModelLoad = () => {
@@ -153,23 +165,39 @@ export default function analyzeVideo() {
             const blazePoseModel = await blazePoseModelLoad()
             setBlazePoseModel(blazePoseModel)
 
+            // 既存のLSTMモデルを使用する際のコード
+            const lstmModel = async () => {
+                console.log("LSTMモデルロード開始")
+                const model = await tf.loadLayersModel(modelUrl);
+                const learningRate = 0.001;
+                const optimizer = tf.train.adam(learningRate);
+                model.compile({
+                    optimizer: optimizer,
+                    loss:
+                        'categoricalCrossentropy' //多クラス分類のための損失関数 ※ワンホットエンコーディング必須
+                    // 'sparseCategoricalCrossentropy' //多クラス分類のための損失関数
+                    // 'binaryCrossentropy' //二値分類のための損失関数
+                    ,
+                    metrics: ['accuracy']
+                });
+                setLstmModel(model)
+            }
+            lstmModel()
+
+            // 独自のLSTMモデル用意する際のコード
+            // const lstmModel = createLSTMModel(inputSize, featureSize, outputSize, lstmUnits);
+            // setLstmModel(lstmModel)
 
             const yTrain = tf.tensor2d([[1, 0], [0, 1]], [numSamples, outputSize]);
-            // const predict = tf.tensor3d([[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]], [numSamples, inputSize, featureSize]);
-            // const testPredict = tf.tensor3d([[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], [numSamples, inputSize, featureSize]);
-            // console.log([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]])
-            // setXTrain(xTrain)
             setYTrain(yTrain)
-            // setXPredict(predict)
-            // setXTestPredict(testPredict)
-
             console.log("モデルロード完全終了")
         }
-        const videoElement = videoRef.current
-        const canvasElement = canvasRef.current
+
 
         modelLoad()
 
+        const videoElement = videoRef.current
+        const canvasElement = canvasRef.current
         if (videoElement && canvasElement) {
             const ctx = canvasElement.getContext('2d')
             setCtx(ctx)
@@ -178,39 +206,68 @@ export default function analyzeVideo() {
         }
     }
 
-    const inputSize = 10; // シーケンス長 []の数
-    const featureSize = 1; // サンプル内の特徴量の数
-    const outputSize = 2; // 出力の次元数,numSamplesと同じ値にすること
-    const lstmUnits = 50;   // LSTMユニットの数
-    const numSamples = 2; // サンプル数,データの総数のこと
-
-
-    const handleLstmLoad = () => {
-        console.log("モデルロード開始開始")
-
-
-        // const modelUrl = '/models/myLSTMModels/v1/lstm-model.json';
-        // const lstmModel = async () => {
-        //     const model = await tf.loadLayersModel(modelUrl);
-        //     const learningRate = 0.001;
-        //     const optimizer = tf.train.adam(learningRate);
-        //     model.compile({
-        //         optimizer: optimizer,
-        //         loss:
-        //             'categoricalCrossentropy' //多クラス分類のための損失関数 ※ワンホットエンコーディング必須
-        //         // 'sparseCategoricalCrossentropy' //多クラス分類のための損失関数
-        //         // 'binaryCrossentropy' //二値分類のための損失関数
-        //         ,
-        //         metrics: ['accuracy']
-        //     });
-        //     setLstmModel(model)
-        // }
-        // lstmModel()
-
-        // 独自のLSTMモデル用意する際のコード
-        const lstmModel = createLSTMModel(inputSize, featureSize, outputSize, lstmUnits);
-        setLstmModel(lstmModel)
-        console.log("モデルロード終わり")
+    const addCroppImageArray = (data: any) => {
+        const addArray = (key: any, array: any) => {
+            if (key === "select1") {
+                const videoTensor = tf.browser.fromPixels(canvasRef1.current as HTMLCanvasElement);
+                console.log(videoTensor)
+                array.current.push(videoTensor)
+            } else if (key === "select2") {
+                const videoTensor = tf.browser.fromPixels(canvasRef2.current as HTMLCanvasElement);
+                array.current.push(videoTensor)
+                console.log(videoTensor)
+            }
+        }
+        otherPeople.current = false
+        ctx?.clearRect(0, 0, canvasRef.current?.width as number, canvasRef.current?.height as number)
+        Object.entries(data).map(([key, value]) => {
+            switch (value) {
+                case "myself":
+                    addArray(key, myselfRefArray)
+                    console.log(myselfRefArray.current)
+                    break;
+                case "opponent":
+                    addArray(key, opponentRefArray)
+                    console.log(opponentRefArray.current)
+                    break;
+                case "other":
+                    otherPeople.current = true
+                    break;
+                case "impactJudgment":
+                    setHitJudgment(false)
+                    break;
+            }
+        })
+        otherPeople.current && handlePlayIndex.current--
+        if (handlePlayIndex.current === addExampletimes) {
+            const addExample = (personRefArray: any, personName: string) => {
+                personRefArray.forEach((croppedImageTensor: any) => {
+                    const learningIndex = 5
+                    const activation = (mobileNetModel as any).infer(croppedImageTensor, 'conv_preds')
+                    for (let index = 0; index < learningIndex; index++) {
+                        classifier.addExample(activation, personName)
+                    }
+                    activation.dispose()
+                });
+            }
+            addExample(myselfRefArray.current, "myself")
+            addExample(opponentRefArray.current, "opponent")
+            console.log("学習しました")
+            setTimeout(() => {
+                if (videoRef.current) {
+                    videoRef.current.style.pointerEvents = 'auto'
+                    videoRef.current.play()
+                }
+            }, exampleTimeLag * 1000)
+        } else if (videoRef.current) {
+            console.log("人物の特徴量を収集OK")
+            setTimeout(() => {
+                if (videoRef.current) {
+                    // videoRef.current.style.pointerEvents = 'auto'
+                    videoRef.current.play()
+                }
+            }, exampleTimeLag * 1000)
+        }
     }
 
 
@@ -271,68 +328,6 @@ export default function analyzeVideo() {
         // console.log(yPixelSize.current)
     }
 
-    const addCroppImageArray = (data: any) => {
-        const addArray = (key: any, array: any) => {
-            if (key === "select1") {
-                const videoTensor = tf.browser.fromPixels(canvasRef1.current as HTMLCanvasElement);
-                console.log(videoTensor)
-                array.current.push(videoTensor)
-            } else if (key === "select2") {
-                const videoTensor = tf.browser.fromPixels(canvasRef2.current as HTMLCanvasElement);
-                array.current.push(videoTensor)
-                console.log(videoTensor)
-            }
-        }
-        otherPeople.current = false
-        ctx?.clearRect(0, 0, canvasRef.current?.width as number, canvasRef.current?.height as number)
-        Object.entries(data).map(([key, value]) => {
-            switch (value) {
-                case "myself":
-                    addArray(key, myselfRefArray)
-                    console.log(myselfRefArray.current)
-                    break;
-                case "opponent":
-                    addArray(key, opponentRefArray)
-                    console.log(opponentRefArray.current)
-                    break;
-                case "other":
-                    otherPeople.current = true
-                    break;
-                case "impactJudgment":
-                    setHitJudgment(false)
-                    break;
-            }
-        })
-        otherPeople.current && handlePlayIndex.current--
-        if (handlePlayIndex.current === addExampletimes) {
-            const addExample = (personRefArray: any, personName: string) => {
-                personRefArray.forEach((croppedImageTensor: any) => {
-                    const learningIndex = 5
-                    const activation = (mobileNetModel as any).infer(croppedImageTensor, 'conv_preds')
-                    for (let index = 0; index < learningIndex; index++) {
-                        classifier.addExample(activation, personName)
-                    }
-                    activation.dispose()
-                });
-            }
-            addExample(myselfRefArray.current, "myself")
-            addExample(opponentRefArray.current, "opponent")
-            console.log("学習しました")
-            setTimeout(() => {
-                if (videoRef.current) {
-                    videoRef.current.style.pointerEvents = 'auto'
-                }
-            }, 1000)
-        } else if (videoRef.current) {
-            console.log("人物の特徴量を収集OK")
-            setTimeout(() => {
-                if (videoRef.current) {
-                    videoRef.current.style.pointerEvents = 'auto'
-                }
-            }, 1000)
-        }
-    }
-
     return (
         <div className={styles.container}>
             <div className={styles.analyzeContainer}>
@@ -360,14 +355,13 @@ export default function analyzeVideo() {
                     <div className={styles.form}>
                         <Form />
                         <button onClick={handleModelLoad}>分析モデルをロードする</button>
-                        <button onClick={handleLstmLoad}>LSTMモデルロードボタン</button>
-                        <button onClick={handleSet}>通常時に設定</button>
-                        <button onClick={handleJabSet}>ジャブに設定</button>
-                        <button onClick={handleJabSet2}>ジャブ2に設定</button>
-                        <button onClick={handleLearn}>学習</button>
-                        <button onClick={handleAddAnalyze}>分析処理追加</button>
-                        <button onClick={handlePixel}>ビクセル100プラス</button>
-                        <button onClick={handleSaveModel}>モデルセーブ</button>
+                        {/* <button onClick={handleSet}>通常時に設定</button> */}
+                        {/* <button onClick={handleJabSet}>ジャブに設定</button> */}
+                        {/* <button onClick={handleJabSet2}>ジャブ2に設定</button> */}
+                        {/* <button onClick={handleLearn}>学習</button> */}
+                        {/* <button onClick={handleAddAnalyze}>分析処理追加</button> */}
+                        {/* <button onClick={handlePixel}>ビクセル100プラス</button> */}
+                        {/* <button onClick={handleSaveModel}>モデルセーブ</button> */}
                     </div>
                 </ div>
                 <div className={styles.canvasContainer}>
@@ -376,6 +370,20 @@ export default function analyzeVideo() {
                         <canvas ref={canvasRef2} className={styles.subCanvas} />
                     </div>
                     <ExampleForm addCroppImageArray={addCroppImageArray} />
+                    <div className={styles.tableContainer}>
+                        <table className={styles.clickTable}>
+                            <thead>
+                                <tr>
+                                    <th>ジャブの回数</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{jabCount || 0}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

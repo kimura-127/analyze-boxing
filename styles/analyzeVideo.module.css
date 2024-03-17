@@ -1,5 +1,5 @@
 .container {
-    height: 85vh;
+    height: 87vh;
     width: 90%;
     margin: 0 auto;
     background-color: rgba(28, 28, 28, 0.706);
@@ -53,7 +53,7 @@
     flex-direction: column;
     position: relative;
     top: 60px;
-    height: 50vh;
+    height: 75vh;
     width: 20vw;
     border: 3px solid rgb(255, 255, 255);
     border-radius: 15px;
@@ -74,4 +74,27 @@
     position: relative;
     top: 1.5vh;
     height: 37vh;
+}
+
+.tableContainer {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    /* box-shadow: 0px 0px 10px #eee; */
+}
+
+.clickTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.clickTable th,
+.clickTable td {
+    text-align: left;
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+
+.clickTable th {
+    background-color: #000000;
 }

@@ -20,7 +20,7 @@ export const drawSkeleton = (ctx: any, videoElement: any, keypoints: any, poses:
         ctx.closePath();
         ctx.stroke();
 
-        keypoints.slice(11, 16).forEach((keypoint: any) => {
+        keypoints.slice(11, 14).forEach((keypoint: any) => {
             if (keypoint.score > drawScore) {
 
                 const xMinLarge = 1
