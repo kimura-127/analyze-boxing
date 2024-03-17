@@ -20,16 +20,6 @@ const ExampleForm = ({ addCroppImageArray }: { addCroppImageArray: (data: any) =
                         <option value="other">その他</option>
                     </select>
                 </div>
-                {/* <select {...register("select3", { required: true })} style={{ width: "100px" }}>
-                    <option value="myself">自分</option>
-                    <option value="opponent">相手</option>
-                    <option value="other">その他</option>
-                </select>
-                <select {...register("select4", { required: true })} style={{ width: "100px" }}>
-                    <option value="myself">自分</option>
-                    <option value="opponent">相手</option>
-                    <option value="other">その他</option>
-                </select> */}
                 <div className={styles.underForm}>
                     <select {...register("select3", { required: true })} className={styles.form}>
                         <option value="hitJudgment">被弾判定</option>

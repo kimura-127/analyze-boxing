@@ -5,7 +5,7 @@ import { videoSrcState } from "@/atoms/videoSrcState";
 import styles from "../../styles/form.module.css"
 
 const Form = () => {
-    const [videoSrc, setVideoSrc] = useRecoilState(videoSrcState)
+    const [_, setVideoSrc] = useRecoilState(videoSrcState)
     const { register, handleSubmit } = useForm<FormData>();
     type FormData = {
         video: FileList;

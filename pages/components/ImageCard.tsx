@@ -1,6 +1,6 @@
-// components/ImageCard.tsx
 import React from 'react';
-import styles from '../../styles/ImageCard.module.css'; // スタイルを適用するために別途CSSファイルを作成すること
+import Image from 'next/image';
+import styles from '../../styles/ImageCard.module.css';
 
 interface ImageCardProps {
     src: string;
@@ -12,7 +12,7 @@ interface ImageCardProps {
 const ImageCard: React.FC<ImageCardProps> = ({ src, alt, header, description }) => {
     return (
         <div className={styles.usecase}>
-            <img className={styles.usecaseImage} src={src} alt={alt} />
+            <Image className={styles.usecaseImage} src={src} alt={alt} width={250} height={250} />
             <div className={styles.usecaseItem}>
                 <h3 className={styles.header}>{header}</h3>
                 <p className={styles.description}>{description}</p>
