@@ -1,6 +1,6 @@
 import styles from "../../styles/termsOfService.module.css"
 
-const privacyPolicy = () => {
+const PrivacyPolicy = () => {
     return (
         <main>
             <div className={styles.termsContainer}>
@@ -55,4 +55,4 @@ const privacyPolicy = () => {
     );
 };
 
-export default privacyPolicy;
+export default PrivacyPolicy;

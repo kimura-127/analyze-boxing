@@ -23,7 +23,7 @@ import ProgressBar from "../components/ProgressBar";
 
 
 
-export default function analyzeVideo() {
+export default function AnalyzeVideo() {
 
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
