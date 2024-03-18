@@ -30,7 +30,7 @@ https://www.analyze-boxing.com
 フレームワーク: Next.js   
 言語:Typescript  
 主に使用したライブラリ:tensorflow.js
-分析モデル:pose Detection(MoveNet(姿勢推定),BlazePose(姿勢推定)),MobileNet(特徴量算出,人物の学習に使用),LSTMModel()
+分析モデル:pose Detection(MoveNet(姿勢推定),BlazePose(姿勢推定)),MobileNet(特徴量算出,人物の学習に使用),LSTMModel(時系列データのパターンを学習・推定)
 - バックエンド  
 インフラ:vercel
 - 開発人数  
