@@ -52,8 +52,8 @@ export default function AnalyzeVideo() {
     const yPixelSize = useRef(800)
     const handlePlayIndex = useRef(0)
     const moveNetPoses = useRef<poseDetection.Pose[]>()
-    const nextAddClock = 1
-    const addExampletimes = 2
+    const nextAddClock = 3
+    const addExampletimes = 4
     const personLength = 2
     const exampleTimeLag = 4
     const myselfRefArray = useRef([])
@@ -405,5 +405,5 @@ export default function AnalyzeVideo() {
                 </div>
             </div>
         </div >
-    ) 
+    )
 }
