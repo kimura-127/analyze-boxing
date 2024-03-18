@@ -52,13 +52,14 @@ export default function AnalyzeVideo() {
     const yPixelSize = useRef(800)
     const handlePlayIndex = useRef(0)
     const moveNetPoses = useRef<poseDetection.Pose[]>()
-    const nextAddClock = 4
-    const addExampletimes = 3
+    const nextAddClock = 1
+    const addExampletimes = 2
     const personLength = 2
     const exampleTimeLag = 4
     const myselfRefArray = useRef([])
     const opponentRefArray = useRef([])
-    const [jabCount, setJabCount] = useState<number>(0)
+    const jabCount = useRef(0)
+    const countRef = useRef<HTMLDivElement>(null)
     const modelUrl = '/models/myLSTMModels/v2/lstm-model.json';
 
 
@@ -133,8 +134,9 @@ export default function AnalyzeVideo() {
                         const prediction: any = lstmModel.predict(xTrain);
                         prediction.array().then((array: any) => {
                             console.log(array[0][0].toFixed(1), array[0][1].toFixed(1));
-                            if (array[0][1].toFixed(1) > 0.5) {
-                                setJabCount(jabCount + 1)
+                            if (array[0][1].toFixed(1) > 0.5 && countRef.current) {
+                                jabCount.current++
+                                countRef.current.textContent = jabCount.current.toString()
                             }
                         });
                     }
@@ -393,13 +395,15 @@ export default function AnalyzeVideo() {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>{jabCount || 0}</td>
+                                    <td>
+                                        <div ref={countRef}>0</div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
