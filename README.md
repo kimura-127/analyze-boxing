@@ -1,40 +1,49 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## アプリケーション名
+「AnalyzeBoxing」
+## アプリケーションの概要
+- 何ができるのか  
+動画の内容を解析し格闘技のおけるスパーリング・試合でのジャブの回数を推定することができます。
+  
+- 誰のために作ったのか  
+ボクシングジムではスパーリングや試合を行った際に動画を撮影し、後に見返し自己分析をすることが一般的であり、その際にデータに基づいた自己分析を行い、より高みを目指すボクサーのために作りました。
 
-## Getting Started
+- 何のために作ったか
+いつもと違う観点から自分のボクシングを見ることで、普段気づかない自分の弱点や強みを認識することにより、さらなる成長できると考えたため作りました。
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- URL  
+https://www.analyze-boxing.com
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- 利用方法  
+1.分析画面にて分析モデルをロードする。
+2.分析したい動画を選択する。
+3.自分と相手の顔をそれぞれAIに学習させる。
+4.再生ボタンを押すことで自動で分析開始。
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+- 今後実装する予定の機能  
+1.今後は右ストレート、左右フック、左右アッパーなどの情報もLSTMモデルに学習させ推定できるようにする。
+2.パンチが命中したかどうかを姿勢推定により判別できるようにする。
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## 開発について
+### 使用技術  
+- フロントエンド  
+フレームワーク: Next.js   
+言語:Typescript  
+主に使用したライブラリ:tensorflow.js
+分析モデル:pose Detection(MoveNet(姿勢推定),BlazePose(姿勢推定)),MobileNet(特徴量算出,人物の学習に使用),LSTMModel()
+- バックエンド  
+インフラ:vercel
+- 開発人数  
+個人開発  
+- 分析の際のロジック
+1.MoveNetにより人物のバウンディングボックス(ビデオフレーム内の人物を囲む矩形)を推定
+2.MobileNetによりバウンディングボックス内の人物を判別
+3.BlazePoseにより人物の骨格の座標を推定
+4.LSTMModelにより骨格の座標の情報を処理し、ジャブを推定
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
