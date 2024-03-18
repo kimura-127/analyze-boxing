@@ -405,5 +405,5 @@ export default function AnalyzeVideo() {
                 </div>
             </div>
         </div >
-    )
+    ) 
 }

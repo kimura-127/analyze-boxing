@@ -33,7 +33,7 @@ const Home = () => {
           <Link href="/TermsOfService" className={styles.footerLink}>
             利用規約
           </Link>
-          <Link href="/PrivacyPolicy" className={styles.footerLink}>
+          <Link href="/privacypolicy" className={styles.footerLink}>
             プライバシーポリシー
           </Link>
         </div>
