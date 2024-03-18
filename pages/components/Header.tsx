@@ -15,10 +15,10 @@ const Header = () => {
                     <Link href="/">
                         <li className={styles.navItem}>ホーム</li>
                     </Link>
-                    <Link href="/analyzevideo">
+                    <Link href="/analyze-video">
                         <li className={styles.navItem}>分析画面</li>
                     </Link>
-                    <Link href="/contactform">
+                    <Link href="/contact-form">
                         <li className={styles.navItem}>お問い合わせ</li>
                     </Link>
                 </ul>
