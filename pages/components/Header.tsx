@@ -15,7 +15,7 @@ const Header = () => {
                     <Link href="/">
                         <li className={styles.navItem}>ホーム</li>
                     </Link>
-                    <Link href="/analyzeVideo">
+                    <Link href="/AnalyzeVideo">
                         <li className={styles.navItem}>分析画面</li>
                     </Link>
                     <Link href="/ContactForm">

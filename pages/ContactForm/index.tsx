@@ -10,20 +10,25 @@ const ContactForm = () => {
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        const response = await fetch('/api/sendEmail', {
+        console.log("aaaa")
+        await fetch('/api/sendEmail', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, message }),
-        });
-        if (response.ok) {
-            alert('メールが送信されました！');
-            setEmail('');
-            setMessage('');
-        } else {
-            alert('メールの送信に失敗しました。');
-        }
+            body: JSON.stringify({ name, email, message }),
+        })
+            .then((res) => {
+                if (res.status === 200) {
+                    alert('メールが送信されました！');
+                    setEmail('');
+                    setMessage('');
+                    console.log("ok")
+                } else {
+                    alert('メールの送信に失敗しました。');
+                    console.log("no")
+                }
+            })
     };
 
     return (
@@ -41,7 +46,7 @@ const ContactForm = () => {
                     />
                 </div>
                 <div className={styles.inputGroup}>
-                    <label htmlFor="email" className={styles.label}>メールアドレス</label>
+                    <label htmlFor="email" className={styles.label}>ご自身のメールアドレス・連絡先</label>
                     <input
                         type="email"
                         id="email"
