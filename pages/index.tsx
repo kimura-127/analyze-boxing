@@ -15,7 +15,7 @@ const Home = () => {
           <p>AnalyzBoxingはスパーリング・試合<br />の動画を解析することができるアプリです</p>
         </div>
         <h1 className={styles.title}>今すぐ始める</h1>
-        <Link href="/analyzeVideo">
+        <Link href="/AnalyzeVideo">
           <button className={styles.transferButton}>分析画面</button>
         </Link>
       </main>
@@ -30,10 +30,10 @@ const Home = () => {
       </div>
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
-          <Link href="/termsOfService" className={styles.footerLink}>
+          <Link href="/TermsOfService" className={styles.footerLink}>
             利用規約
           </Link>
-          <Link href="/privacyPolicy" className={styles.footerLink}>
+          <Link href="/PrivacyPolicy" className={styles.footerLink}>
             プライバシーポリシー
           </Link>
         </div>
