@@ -13,7 +13,6 @@ export const createLSTMModel = (inputSize: any, featureSize: any, outputSize: an
     model.add(tf.layers.dense({
         units: outputSize, activation:
             'softmax'
-        // 'sigmoid'
     }));
 
     const learningRate = 0.001;
