@@ -1,8 +1,7 @@
 import Form from "../components/Form"
-import { mobileNetModelLoad } from "@/utils/mobileNetModelLoad";
 import { moveNetModelLoad } from "@/utils/moveNetModelLoad";
 import { blazePoseModelLoad } from "@/utils/blazePoseModelLoad";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import * as mobilenet from '@tensorflow-models/mobilenet';
 import * as tf from '@tensorflow/tfjs';
@@ -37,11 +36,8 @@ export default function AnalyzeVideo() {
     const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null)
     const classifier = knnClassifier.create();
     const [lstmModel, setLstmModel] = useState<any>()
-    const [xTrain, setXTrain] = useState<tf.Tensor3D>()
-    const [xPredict, setXPredict] = useState<tf.Tensor3D>()
     const [yTrain, setYTrain] = useState<tf.Tensor2D>()
     const [overlayVisible, setOverlayVisible] = useState(true);
-    const [xTestPredict, setXTestPredict] = useState<tf.Tensor3D>()
     const [handleProgress, setHandleProgress] = useState(0)
     const boxerKeypoint: any = []
     const jabKeypoint: any = []
@@ -276,7 +272,6 @@ export default function AnalyzeVideo() {
             console.log("人物の特徴量を収集OK")
             setTimeout(() => {
                 if (videoRef.current) {
-                    // videoRef.current.style.pointerEvents = 'auto'
                     videoRef.current.play()
                 }
             }, exampleTimeLag * 1000)
@@ -324,11 +319,6 @@ export default function AnalyzeVideo() {
         }
     }
 
-    const handlePixel = () => {
-        // yPixelSize.current += 100
-        // console.log(yPixelSize.current)
-    }
-
     const handleSaveModel = () => {
         const saveModel = async () => {
             if (lstmModel) {
@@ -336,9 +326,6 @@ export default function AnalyzeVideo() {
             }
         }
         saveModel()
-
-        // yPixelSize.current -= 100
-        // console.log(yPixelSize.current)
     }
 
     return (
