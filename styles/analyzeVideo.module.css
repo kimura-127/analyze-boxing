@@ -4,7 +4,6 @@
     margin: 0 auto;
     background-color: rgba(28, 28, 28, 0.706);
     border-radius: 15px;
-    /* border: 2px solid rgba(0, 255, 255, 0.569); */
 }
 
 
@@ -164,36 +163,28 @@
 
     .indexSpace {
         display: none;
-        /* 例えば、スペースが必要なければ非表示に */
     }
 
     .form,
     .canvasContainer {
         width: 90%;
-        /* コンテナの幅を調整 */
         margin-top: 20px;
-        /* 上の要素との間隔 */
     }
 
     .subCanvasContainer {
         flex-direction: column;
-        /* サブキャンバスを縦に並べる */
         height: auto;
         top: 20px;
     }
 
     .subCanvas {
         width: 90%;
-        /* サブキャンバスの幅を親コンテナに合わせる */
         height: 120px;
-        /* サブキャンバスの高さを調整 */
         margin: 10px auto;
-        /* サブキャンバス間の余白を追加 */
     }
 
     .tableContainer {
         width: 90%;
-        /* テーブルコンテナの幅を調整 */
     }
 
     .overlay {
@@ -205,6 +196,11 @@
 
     .overlay button {
         padding: 12px 24px;
-        /* ボタンのサイズを調整 */
+    }
+}
+
+@media (max-width:768) {
+    .subCanvas {
+        margin: 3px auto;
     }
 }
