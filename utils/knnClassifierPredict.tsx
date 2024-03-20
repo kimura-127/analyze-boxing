@@ -12,7 +12,6 @@ export const knnClassifierPredict = async (mobileNetModel: mobilenet.MobileNet, 
 
     try {
         feature = mobileNetModel.infer(croppedImage, true);
-        console.log(feature)
         const result = await classifier.predictClass(feature);
         if (result.label === personName && blazePoseModel) {
             squeezedImage = tf.squeeze(croppedImage, [0]);

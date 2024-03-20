@@ -1,9 +1,15 @@
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import React from 'react';
 import styles from "../../styles/exampleForm.module.css"
 
-const ExampleForm = ({ addCroppImageArray }: { addCroppImageArray: (data: any) => void }) => {
-    const { register, handleSubmit } = useForm();
+type FormData = {
+    select1: string;
+    select2: string;
+    select3: string;
+}
+
+const ExampleForm = ({ addCroppImageArray }: { addCroppImageArray: SubmitHandler<FormData> }) => {
+    const { register, handleSubmit } = useForm<FormData>();
 
     return (
         <>
