@@ -1,4 +1,6 @@
-export const drawSkeleton = (ctx: any, videoElement: any, keypoints: any, poses: any, yPixelSize: number) => {
+import { Pose } from "@mediapipe/pose";
+
+export const drawSkeleton = (ctx: CanvasRenderingContext2D | null, videoElement: HTMLVideoElement, keypoints: any, poses: any, yPixelSize: number) => {
     if (ctx && videoElement && keypoints && poses) {
         ctx.fillStyle = "white";
         ctx.strokeStyle = "white";

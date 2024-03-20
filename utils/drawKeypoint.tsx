@@ -1,6 +1,7 @@
+import { Pose } from "@tensorflow-models/pose-detection"
 
 
-export const drawKeypoint = async (ctx: CanvasRenderingContext2D | null, videoElement: HTMLVideoElement | null, analyze: any) => {
+export const drawKeypoint = async (ctx: CanvasRenderingContext2D | null, videoElement: HTMLVideoElement | null, analyze: Pose) => {
     if (ctx && videoElement && analyze) {
         ctx.fillStyle = "white"
         ctx.strokeStyle = "white"
@@ -16,7 +17,6 @@ export const drawKeypoint = async (ctx: CanvasRenderingContext2D | null, videoEl
         const rightHip = [analyze.keypoints[12].x / videoElement.videoWidth * 700, analyze.keypoints[12].y / videoElement.videoHeight * 400]
         ctx.beginPath();
         ctx.textAlign = "center"
-        ctx.strokeText(analyze.id, nose[0], nose[1] - 25);
         ctx.arc(nose[0], nose[1], 10, 0, 2 * Math.PI);
         ctx.moveTo(leftWrist[0], leftWrist[1]);
         ctx.lineTo(leftElbow[0], leftElbow[1])

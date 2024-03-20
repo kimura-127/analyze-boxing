@@ -3,18 +3,20 @@ import * as mobilenet from '@tensorflow-models/mobilenet';
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
 import * as tf from '@tensorflow/tfjs';
 import * as poseDetection from '@tensorflow-models/pose-detection';
+import { Tensor3D } from '@tensorflow/tfjs';
 
 
-export const knnClassifierPredict = async (mobileNetModel: any, croppedImage: any, classifier: any, blazePoseModel: any, personName: any) => {
+export const knnClassifierPredict = async (mobileNetModel: mobilenet.MobileNet, croppedImage: any, classifier: knnClassifier.KNNClassifier, blazePoseModel: poseDetection.PoseDetector, personName: string) => {
     let feature;
     let squeezedImage;
 
     try {
-        feature = mobileNetModel.infer(croppedImage, 'conv_preds');
+        feature = mobileNetModel.infer(croppedImage, true);
+        console.log(feature)
         const result = await classifier.predictClass(feature);
         if (result.label === personName && blazePoseModel) {
             squeezedImage = tf.squeeze(croppedImage, [0]);
-            const keyPoint = await blazePoseModel.estimatePoses(squeezedImage);
+            const keyPoint = await blazePoseModel.estimatePoses(squeezedImage as any);
             return keyPoint;
         } else {
             return null;

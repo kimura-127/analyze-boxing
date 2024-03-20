@@ -326,12 +326,13 @@ export default function AnalyzeVideo() {
 
     // LSTMモデルをセーブ時に実行
     const handleSaveModel = () => {
-        const saveModel = async () => {
-            if (lstmModel) {
-                await lstmModel.save('downloads://lstm-model');
-            }
-        }
-        saveModel()
+        // const saveModel = async () => {
+        //     if (lstmModel) {
+        //         await lstmModel.save('downloads://lstm-model');
+        //     }
+        // }
+        // saveModel()
+        console.log(tf.memory())
     }
 
     return (
@@ -374,7 +375,7 @@ export default function AnalyzeVideo() {
                         {/* <button onClick={handleLearn}>学習</button> */}
                         {/* <button onClick={handleAddAnalyze}>分析処理追加</button> */}
                         {/* <button onClick={handlePixel}>ビクセル100プラス</button> */}
-                        {/* <button onClick={handleSaveModel}>モデルセーブ</button> */}
+                        <button onClick={handleSaveModel}>モデルセーブ</button>
                     </div>
                 </ div>
                 <div className={styles.canvasContainer}>
