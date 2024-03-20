@@ -71,3 +71,10 @@
     background-color: #555;
     color: aqua;
 }
+
+
+@media (max-width: 768px) {
+    .appName {
+        font-size: 1.2rem;
+    }
+}

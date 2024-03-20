@@ -157,6 +157,10 @@ export default function AnalyzeVideo() {
 
     const handleModelLoad = () => {
         const modelLoad = async () => {
+            if (window.innerWidth < 768) {
+                window.alert("このアプリはスマートフォンには対応しておりません。")
+                return
+            }
             console.log("モデルロード開始")
 
             await tf.ready()
