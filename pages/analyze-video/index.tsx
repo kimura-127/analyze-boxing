@@ -59,7 +59,7 @@ export default function AnalyzeVideo() {
     const modelUrl = '/models/myLSTMModels/v2/lstm-model.json';
 
 
-
+    // 動画再生時に実行
     const handlePlay = () => {
         const videoElement = videoRef.current
         const canvasElement = canvasRef.current
@@ -70,7 +70,7 @@ export default function AnalyzeVideo() {
 
 
         if (moveNetModel && videoElement && handlePlayIndex.current < addExampletimes) {
-
+            // 人物学習時の処理
             const animate = async () => {
                 const poses = await moveNetModel.estimatePoses(videoElement);
                 console.log(poses)
@@ -93,6 +93,7 @@ export default function AnalyzeVideo() {
                 requestAnimationFrame(animate)
             }, nextAddClock * 1000)
         } else if (moveNetModel && videoElement) {
+            // 推定時の処理
             const animate = async () => {
 
                 const poses = await moveNetModel.estimatePoses(videoElement);
@@ -151,6 +152,7 @@ export default function AnalyzeVideo() {
     const numSamples = 2; // サンプル数,データの総数のこと
 
 
+    // モデルロードボタンクリック時に実行
     const handleModelLoad = () => {
         const modelLoad = async () => {
             if (window.innerWidth < 768) {
@@ -215,6 +217,7 @@ export default function AnalyzeVideo() {
         }
     }
 
+    // 学習ボタンクリック時に実行
     const addCroppImageArray = (data: any) => {
         const addArray = (key: any, array: any) => {
             if (key === "select1") {
@@ -278,26 +281,27 @@ export default function AnalyzeVideo() {
         }
     }
 
-
+    // LSTMモデル学習前にデータを格納する時に実行
     const handleJabSet2 = () => {
         jabKeypoint2.length = 0
         boxerKeypoint.map((kp: any) => { jabKeypoint2.push(kp) })
         console.log(jabKeypoint2)
     }
-
+    // LSTMモデル学習前にデータを格納する時に実行
     const handleSet = () => {
         noneJabKeypoint.length = 0
         boxerKeypoint.map((kp: any) => { noneJabKeypoint.push(kp) })
         console.log(noneJabKeypoint)
     }
 
-
+    // LSTMモデル学習前にデータを格納する時に実行
     const handleJabSet = () => {
         jabKeypoint.length = 0
         boxerKeypoint.map((kp: any) => { jabKeypoint.push(kp) })
         console.log(jabKeypoint)
     }
 
+    // LSTMモデル学習時実行
     const handleLearn = () => {
         if (lstmModel && yTrain) {
             const xTrain = tf.tensor3d([noneJabKeypoint, jabKeypoint], [numSamples, inputSize, featureSize]);
@@ -309,6 +313,7 @@ export default function AnalyzeVideo() {
         }
     }
 
+    // LSTMモデルの推定の有無を変更
     const handleAddAnalyze = () => {
         if (handleAnalyze.current) {
             handleAnalyze.current = false
@@ -319,6 +324,7 @@ export default function AnalyzeVideo() {
         }
     }
 
+    // LSTMモデルをセーブ時に実行
     const handleSaveModel = () => {
         const saveModel = async () => {
             if (lstmModel) {
