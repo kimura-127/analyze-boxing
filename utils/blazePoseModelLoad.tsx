@@ -1,5 +1,4 @@
 import * as poseDetection from '@tensorflow-models/pose-detection';
-import '@mediapipe/pose';
 
 
 export const blazePoseModelLoad = async () => {

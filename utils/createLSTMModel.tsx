@@ -1,6 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
 
-export const createLSTMModel = (inputSize: any, featureSize: any, outputSize: any, lstmUnits: any) => {
+export const createLSTMModel = (inputSize: number, featureSize: number, outputSize: number, lstmUnits: number) => {
     const model = tf.sequential();
 
     // LSTMレイヤーの追加
