@@ -18,6 +18,8 @@ import { createLSTMModel } from "@/utils/createLSTMModel";
 import styles from "../../styles/analyzeVideo.module.css"
 import { drawKeypoint } from "@/utils/drawKeypoint";
 import ProgressBar from "../components/ProgressBar";
+import React, { MutableRefObject } from 'react';
+
 
 
 
@@ -35,27 +37,27 @@ export default function AnalyzeVideo() {
     const [blazePoseModel, setBlazePoseModel] = useState<poseDetection.PoseDetector>()
     const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null)
     const classifier = knnClassifier.create();
-    const [lstmModel, setLstmModel] = useState<any>()
+    const [lstmModel, setLstmModel] = useState<tf.LayersModel>()
     const [yTrain, setYTrain] = useState<tf.Tensor2D>()
-    const [overlayVisible, setOverlayVisible] = useState(true);
-    const [handleProgress, setHandleProgress] = useState(0)
-    const boxerKeypoint: any = []
-    const jabKeypoint: any = []
-    const jabKeypoint2: any = []
-    const noneJabKeypoint: any = []
-    const handleAnalyze = useRef(true)
-    const otherPeople = useRef(false)
-    const yPixelSize = useRef(800)
-    const handlePlayIndex = useRef(0)
-    const moveNetPoses = useRef<poseDetection.Pose[]>()
+    const [overlayVisible, setOverlayVisible] = useState<boolean>(true);
+    const [handleProgress, setHandleProgress] = useState<number>(0)
+    const boxerKeypoint: number[][] = []
+    const jabKeypoint: number[][] = []
+    const jabKeypoint2: number[][] = []
+    const noneJabKeypoint: number[][] = []
+    const handleAnalyze: MutableRefObject<boolean> = useRef<boolean>(true)
+    const otherPeople: MutableRefObject<boolean> = useRef<boolean>(false)
+    const yPixelSize: MutableRefObject<number> = useRef<number>(800)
+    const handlePlayIndex: MutableRefObject<number> = useRef<number>(0)
+    const moveNetPoses: MutableRefObject<poseDetection.Pose[] | null> = useRef<poseDetection.Pose[]>(null)
     const nextAddClock = 3
     const addExampletimes = 4
     const personLength = 2
     const exampleTimeLag = 4
-    const myselfRefArray = useRef([])
-    const opponentRefArray = useRef([])
-    const jabCount = useRef(0)
-    const countRef = useRef<HTMLDivElement>(null)
+    const myselfRefArray: MutableRefObject<number[]> = useRef<number[]>([])
+    const opponentRefArray: MutableRefObject<number[]> = useRef<number[]>([])
+    const jabCount: MutableRefObject<number> = useRef<number>(0)
+    const countRef: MutableRefObject<HTMLDivElement | null> = useRef<HTMLDivElement>(null)
     const modelUrl = '/models/myLSTMModels/v2/lstm-model.json';
 
 
@@ -104,7 +106,7 @@ export default function AnalyzeVideo() {
                     const predictKeypoint = (personName: string) => {
                         croppedImageData.forEach((croppedImage: any, index: number) => {
                             knnClassifierPredict(mobileNetModel, croppedImage, classifier, blazePoseModel, personName).then((result) => {
-                                const array: any[] = []
+                                const array: number[] = []
                                 if (result && result.length > 0) {
                                     canvasElement && ctx?.clearRect(0, 0, canvasElement.width, canvasElement.height);
                                     drawSkeleton(ctx, videoElement, result[0].keypoints, poses[index], yPixelSize.current)
@@ -129,9 +131,9 @@ export default function AnalyzeVideo() {
                     if (handleAnalyze.current && lstmModel && boxerKeypoint.length == inputSize) {
                         const xTrain = tf.tensor3d([boxerKeypoint, boxerKeypoint], [numSamples, inputSize, featureSize]);
                         const prediction: any = lstmModel.predict(xTrain);
-                        prediction.array().then((array: any) => {
+                        prediction.array().then((array: number[][]) => {
                             console.log(array[0][0].toFixed(1), array[0][1].toFixed(1));
-                            if (array[0][1].toFixed(1) > 0.5 && countRef.current) {
+                            if (parseFloat(array[0][1].toFixed(1)) && countRef.current) {
                                 jabCount.current++
                                 countRef.current.textContent = jabCount.current.toString()
                             }
@@ -217,9 +219,14 @@ export default function AnalyzeVideo() {
         }
     }
 
+    interface FormData {
+        select1: string;
+        select2: string;
+        select3: string;
+    }
     // 学習ボタンクリック時に実行
-    const addCroppImageArray = (data: any) => {
-        const addArray = (key: any, array: any) => {
+    const addCroppImageArray = (data: FormData) => {
+        const addArray = (key: string, array: React.MutableRefObject<any>) => {
             if (key === "select1") {
                 const videoTensor = tf.browser.fromPixels(canvasRef1.current as HTMLCanvasElement);
                 console.log(videoTensor)
@@ -253,7 +260,7 @@ export default function AnalyzeVideo() {
         otherPeople.current && handlePlayIndex.current--
         if (handlePlayIndex.current === addExampletimes) {
             const addExample = (personRefArray: any, personName: string) => {
-                personRefArray.forEach((croppedImageTensor: any) => {
+                personRefArray.forEach((croppedImageTensor: tf.Tensor) => {
                     const learningIndex = 5
                     const activation = (mobileNetModel as any).infer(croppedImageTensor, 'conv_preds')
                     for (let index = 0; index < learningIndex; index++) {
@@ -284,20 +291,20 @@ export default function AnalyzeVideo() {
     // LSTMモデル学習前にデータを格納する時に実行
     const handleJabSet2 = () => {
         jabKeypoint2.length = 0
-        boxerKeypoint.map((kp: any) => { jabKeypoint2.push(kp) })
+        boxerKeypoint.map((kp: number[]) => { jabKeypoint2.push(kp) })
         console.log(jabKeypoint2)
     }
     // LSTMモデル学習前にデータを格納する時に実行
     const handleSet = () => {
         noneJabKeypoint.length = 0
-        boxerKeypoint.map((kp: any) => { noneJabKeypoint.push(kp) })
+        boxerKeypoint.map((kp: number[]) => { noneJabKeypoint.push(kp) })
         console.log(noneJabKeypoint)
     }
 
     // LSTMモデル学習前にデータを格納する時に実行
     const handleJabSet = () => {
         jabKeypoint.length = 0
-        boxerKeypoint.map((kp: any) => { jabKeypoint.push(kp) })
+        boxerKeypoint.map((kp: number[]) => { jabKeypoint.push(kp) })
         console.log(jabKeypoint)
     }
 
@@ -326,13 +333,12 @@ export default function AnalyzeVideo() {
 
     // LSTMモデルをセーブ時に実行
     const handleSaveModel = () => {
-        // const saveModel = async () => {
-        //     if (lstmModel) {
-        //         await lstmModel.save('downloads://lstm-model');
-        //     }
-        // }
-        // saveModel()
-        console.log(tf.memory())
+        const saveModel = async () => {
+            if (lstmModel) {
+                await lstmModel.save('downloads://lstm-model');
+            }
+        }
+        saveModel()
     }
 
     return (
@@ -375,7 +381,7 @@ export default function AnalyzeVideo() {
                         {/* <button onClick={handleLearn}>学習</button> */}
                         {/* <button onClick={handleAddAnalyze}>分析処理追加</button> */}
                         {/* <button onClick={handlePixel}>ビクセル100プラス</button> */}
-                        <button onClick={handleSaveModel}>モデルセーブ</button>
+                        {/* <button onClick={handleSaveModel}>モデルセーブ</button> */}
                     </div>
                 </ div>
                 <div className={styles.canvasContainer}>
