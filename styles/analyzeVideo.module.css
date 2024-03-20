@@ -133,3 +133,78 @@
 .overlay button:hover {
     background-color: #0056b3;
 }
+
+@media (max-width: 768px) {
+    .container {
+        height: auto;
+        width: 100%;
+        margin-top: 20px;
+        border-radius: 0;
+    }
+
+    .analyzeContainer,
+    .video,
+    .canvas {
+        position: relative;
+        width: 100%;
+        height: auto;
+        left: 0;
+        top: 0;
+    }
+
+    .spaceContainer {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .space {
+        width: 100%;
+        height: auto;
+    }
+
+    .indexSpace {
+        display: none;
+        /* 例えば、スペースが必要なければ非表示に */
+    }
+
+    .form,
+    .canvasContainer {
+        width: 90%;
+        /* コンテナの幅を調整 */
+        margin-top: 20px;
+        /* 上の要素との間隔 */
+    }
+
+    .subCanvasContainer {
+        flex-direction: column;
+        /* サブキャンバスを縦に並べる */
+        height: auto;
+        top: 20px;
+    }
+
+    .subCanvas {
+        width: 90%;
+        /* サブキャンバスの幅を親コンテナに合わせる */
+        height: 120px;
+        /* サブキャンバスの高さを調整 */
+        margin: 10px auto;
+        /* サブキャンバス間の余白を追加 */
+    }
+
+    .tableContainer {
+        width: 90%;
+        /* テーブルコンテナの幅を調整 */
+    }
+
+    .overlay {
+        position: fixed;
+        padding: 20px;
+        width: 100%;
+        height: 100%;
+    }
+
+    .overlay button {
+        padding: 12px 24px;
+        /* ボタンのサイズを調整 */
+    }
+}

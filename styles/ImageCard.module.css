@@ -22,4 +22,47 @@
     line-height: 100px;
 }
 
-.description {}
+
+@media (max-width: 768px) {
+    .usecase {
+        flex-direction: column;
+        /* 横並びから縦並びに変更 */
+        align-items: center;
+        /* アイテムを中央に揃える */
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .usecaseImage {
+        margin-right: 0;
+        /* 右の余白を削除 */
+        margin-bottom: 1rem;
+        /* 画像とテキストの間に余白を追加 */
+        width: 80%;
+        /* 画像の幅を画面幅の80%に */
+        height: auto;
+        /* 画像の高さを自動調整に */
+        border-radius: 15px;
+    }
+
+    .usecaseItem {
+        width: 90%;
+        /* コンテンツ幅を調整 */
+        text-align: center;
+        /* テキストを中央揃えに */
+    }
+
+    .header {
+        margin: 10px 0;
+        /* 上下の余白を調整 */
+        line-height: 1.5;
+        /* 行間を調整 */
+        font-size: 1.2rem;
+        /* 見出しのフォントサイズを大きく */
+    }
+
+    .description {
+        font-size: 1rem;
+        /* 説明文のフォントサイズを調整 */
+    }
+}
